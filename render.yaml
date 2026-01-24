@@ -1,0 +1,19 @@
+services:
+  - type: web
+    name: credilens
+    runtime: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn app:app --bind 0.0.0.0:$PORT
+    envVars:
+      - key: PYTHON_VERSION
+        value: "3.11.4"
+      - key: SECRET_KEY
+        generateValue: true
+      - key: GEMINI_API_KEY
+        sync: false
+      - key: HF_TOKEN
+        sync: false
+      - key: INFURA_API_KEY
+        sync: false
+      - key: ETH_PRIVATE_KEY
+        sync: false
