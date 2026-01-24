@@ -19,10 +19,24 @@ load_dotenv()
 
 app = Flask(__name__)
 BASE_DIR = os.path.abspath(os.path.dirname(__file__))
-DB_PATH = os.path.join(BASE_DIR, 'db.sqlite3')
-app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{DB_PATH}'
+
+# ==========================================
+# DATABASE CONFIGURATION (Hybrid: SQLite local / PostgreSQL production)
+# ==========================================
+# Use PostgreSQL if DATABASE_URL exists (Render production), else SQLite (local dev)
+DATABASE_URL = os.environ.get('DATABASE_URL')
+if DATABASE_URL:
+    # Render provides postgres:// but SQLAlchemy needs postgresql://
+    if DATABASE_URL.startswith('postgres://'):
+        DATABASE_URL = DATABASE_URL.replace('postgres://', 'postgresql://', 1)
+    app.config['SQLALCHEMY_DATABASE_URI'] = DATABASE_URL
+else:
+    # Local development - use SQLite
+    DB_PATH = os.path.join(BASE_DIR, 'db.sqlite3')
+    app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{DB_PATH}'
+
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-app.secret_key = 'dev-secret'
+app.secret_key = os.environ.get('SECRET_KEY', 'dev-secret')
 
 # ==========================================
 # SESSION TIMEOUT CONFIGURATION

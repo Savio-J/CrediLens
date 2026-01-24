@@ -1,3 +1,9 @@
+databases:
+  - name: credilens-db
+    plan: free
+    databaseName: credilens
+    user: credilens
+
 services:
   - type: web
     name: credilens
@@ -9,6 +15,10 @@ services:
         value: "3.11.4"
       - key: SECRET_KEY
         generateValue: true
+      - key: DATABASE_URL
+        fromDatabase:
+          name: credilens-db
+          property: connectionString
       - key: GEMINI_API_KEY
         sync: false
       - key: HF_TOKEN
