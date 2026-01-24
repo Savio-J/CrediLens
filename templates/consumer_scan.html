@@ -1,0 +1,235 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="max-w-2xl mx-auto text-center">
+    <!-- Back Button -->
+    <a href="/consumer" class="text-gray-500 hover:text-blue-600 mb-6 inline-block flex items-center justify-center">
+        <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg> 
+        Back to Dashboard
+    </a>
+
+    <h2 class="text-2xl font-bold text-gray-900 mb-2">Scan Product QR Code</h2>
+    <p class="text-gray-500 mb-6">Point your camera at a product QR code</p>
+    
+    <!-- Camera Container -->
+    <div class="glass-panel p-4 bg-black rounded-xl overflow-hidden relative aspect-video mb-6">
+        <!-- Video Element (Camera Feed) -->
+        <video id="videoElement" class="w-full h-full object-cover" style="display:none;" autoplay playsinline></video>
+        
+        <!-- Canvas for QR Detection -->
+        <canvas id="canvasElement" class="hidden"></canvas>
+        
+        <!-- Placeholder (shown before camera starts) -->
+        <div id="placeholder" class="text-gray-400 flex flex-col items-center justify-center h-full">
+            <svg class="w-16 h-16 mb-2 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+            <span>Click "Start Camera" below</span>
+        </div>
+        
+        <!-- Scan Line Animation (shown when scanning) -->
+        <div id="scanLine" class="absolute top-0 left-0 w-full h-1 bg-green-500 shadow-[0_0_10px_rgba(34,197,94,0.8)] animate-scan" style="display:none;"></div>
+        
+        <!-- Scan Frame Overlay -->
+        <div id="scanFrame" class="absolute inset-0 pointer-events-none" style="display:none;">
+            <div class="absolute inset-8 border-2 border-green-400 rounded-lg shadow-[0_0_20px_rgba(34,197,94,0.5)]">
+                <!-- Corner markers -->
+                <div class="absolute -top-1 -left-1 w-8 h-8 border-t-4 border-l-4 border-green-400"></div>
+                <div class="absolute -top-1 -right-1 w-8 h-8 border-t-4 border-r-4 border-green-400"></div>
+                <div class="absolute -bottom-1 -left-1 w-8 h-8 border-b-4 border-l-4 border-green-400"></div>
+                <div class="absolute -bottom-1 -right-1 w-8 h-8 border-b-4 border-r-4 border-green-400"></div>
+            </div>
+        </div>
+        
+        <!-- Success Message -->
+        <div id="successMessage" class="absolute inset-0 bg-green-500 bg-opacity-90 flex items-center justify-center" style="display:none;">
+            <div class="text-white text-center">
+                <svg class="w-20 h-20 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                <p class="text-2xl font-bold">QR Code Detected!</p>
+                <p class="text-sm mt-2">Redirecting...</p>
+            </div>
+        </div>
+    </div>
+
+    <style>
+        @keyframes scan {
+            0% { top: 0%; opacity: 0; }
+            10% { opacity: 1; }
+            90% { opacity: 1; }
+            100% { top: 100%; opacity: 0; }
+        }
+        .animate-scan {
+            animation: scan 2.5s linear infinite;
+        }
+    </style>
+
+    <!-- Controls -->
+    <div class="space-y-3">
+        <button id="startBtn" class="w-full bg-blue-600 text-white px-8 py-3 rounded-lg font-bold shadow-lg hover:bg-blue-700 transition">
+            Start Camera
+        </button>
+        <button id="stopBtn" class="w-full bg-gray-600 text-white px-8 py-3 rounded-lg font-bold shadow-lg hover:bg-gray-700 transition" style="display:none;">
+            Stop Camera
+        </button>
+    </div>
+    
+    <!-- Status Messages -->
+    <div id="statusMessage" class="mt-4 text-sm text-gray-600"></div>
+</div>
+
+<!-- jsQR Library for QR Code Detection -->
+<script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js"></script>
+
+<script>
+let video = document.getElementById('videoElement');
+let canvas = document.getElementById('canvasElement');
+let ctx = canvas.getContext('2d');
+let scanning = false;
+let stream = null;
+
+const startBtn = document.getElementById('startBtn');
+const stopBtn = document.getElementById('stopBtn');
+const placeholder = document.getElementById('placeholder');
+const scanLine = document.getElementById('scanLine');
+const scanFrame = document.getElementById('scanFrame');
+const successMessage = document.getElementById('successMessage');
+const statusMessage = document.getElementById('statusMessage');
+
+// Start Camera
+startBtn.addEventListener('click', async function() {
+    try {
+        statusMessage.textContent = 'Requesting camera access...';
+        
+        // Request camera access
+        stream = await navigator.mediaDevices.getUserMedia({ 
+            video: { facingMode: 'environment' } // Use back camera on mobile
+        });
+        
+        video.srcObject = stream;
+        video.play();
+        
+        // Hide placeholder, show video
+        placeholder.style.display = 'none';
+        video.style.display = 'block';
+        scanLine.style.display = 'block';
+        scanFrame.style.display = 'block';
+        
+        // Switch buttons
+        startBtn.style.display = 'none';
+        stopBtn.style.display = 'block';
+        
+        statusMessage.textContent = 'Camera active. Point at a QR code...';
+        
+        // Start scanning
+        scanning = true;
+        requestAnimationFrame(scan);
+        
+    } catch (error) {
+        console.error('Camera error:', error);
+        statusMessage.textContent = 'Error: Unable to access camera. Please allow camera permissions.';
+        statusMessage.className = 'mt-4 text-sm text-red-600';
+    }
+});
+
+// Stop Camera
+stopBtn.addEventListener('click', function() {
+    stopScanning();
+});
+
+function stopScanning() {
+    scanning = false;
+    
+    if (stream) {
+        stream.getTracks().forEach(track => track.stop());
+        stream = null;
+    }
+    
+    video.style.display = 'none';
+    scanLine.style.display = 'none';
+    scanFrame.style.display = 'none';
+    placeholder.style.display = 'flex';
+    
+    startBtn.style.display = 'block';
+    stopBtn.style.display = 'none';
+    
+    statusMessage.textContent = '';
+}
+
+// Scan QR Code
+function scan() {
+    if (!scanning) return;
+    
+    if (video.readyState === video.HAVE_ENOUGH_DATA) {
+        // Set canvas size to match video
+        canvas.height = video.videoHeight;
+        canvas.width = video.videoWidth;
+        
+        // Draw video frame to canvas
+        ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+        
+        // Get image data
+        const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+        
+        // Detect QR code
+        const code = jsQR(imageData.data, imageData.width, imageData.height, {
+            inversionAttempts: "dontInvert",
+        });
+        
+        if (code) {
+            console.log('QR Code detected:', code.data);
+            handleQRCode(code.data);
+            return; // Stop scanning
+        }
+    }
+    
+    requestAnimationFrame(scan);
+}
+
+// Handle detected QR code
+function handleQRCode(qrData) {
+    scanning = false;
+    
+    // Show success message
+    successMessage.style.display = 'flex';
+    statusMessage.textContent = 'QR Code scanned successfully!';
+    statusMessage.className = 'mt-4 text-sm text-green-600';
+    
+    // Extract product ID from QR code
+    // QR format: https://credilens.app/product/{id}
+    let productId = null;
+    
+    // Try to extract ID from URL
+    const urlMatch = qrData.match(/\/product\/(\d+)/);
+    if (urlMatch) {
+        productId = urlMatch[1];
+    } else if (/^\d+$/.test(qrData)) {
+        // If QR is just a number, use it directly
+        productId = qrData;
+    }
+    
+    if (productId) {
+        // Redirect to product detail page after 1 second
+        setTimeout(() => {
+            window.location.href = `/consumer/product/${productId}`;
+        }, 1000);
+    } else {
+        // Invalid QR code
+        successMessage.style.display = 'none';
+        statusMessage.textContent = 'Invalid QR code format. Please scan a valid product QR code.';
+        statusMessage.className = 'mt-4 text-sm text-red-600';
+        
+        // Restart scanning after 2 seconds
+        setTimeout(() => {
+            scanning = true;
+            statusMessage.textContent = 'Scanning...';
+            statusMessage.className = 'mt-4 text-sm text-gray-600';
+            requestAnimationFrame(scan);
+        }, 2000);
+    }
+}
+
+// Clean up when leaving page
+window.addEventListener('beforeunload', function() {
+    if (stream) {
+        stream.getTracks().forEach(track => track.stop());
+    }
+});
+</script>
+{% endblock %}

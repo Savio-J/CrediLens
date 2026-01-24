@@ -1,0 +1,35 @@
+# CrediLens .gitignore
+
+# Environment variables (contains sensitive tokens)
+.env
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Database
+*.sqlite3
+instance/
+
+# Virtual environment
+venv/
+env/
+ENV/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Test files
+test_*.py
+debug_*.py
+diagnose_*.py
+check_*.py

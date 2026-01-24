@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{{ url_for('static', filename='login.css') }}">
+    <link rel="icon" type="image/jpeg" href="{{ url_for('static', filename='last.jpg') }}">
+    <script defer src="{{ url_for('static', filename='login.js') }}"></script>
+    <title>CrediLens | Sign Up</title>
+</head>
+<body>
+    <!-- Notification area -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+      <div class="notification">
+        <ul>
+        {% for category, message in messages %}
+          <li class="{{ category }}" style="font-weight: bold; color: {% if category == 'error' %}#ff6b6b{% else %}#51cf66{% endif %};">{{ message }}</li>
+        {% endfor %}
+        </ul>
+      </div>
+    {% endif %}
+    {% endwith %}
+    
+    <div class="container right-panel-active">
+        <!-- Producer Sign Up -->
+        <div class="container__form container--signup">
+            <form action="{{ url_for('signup') }}" method="POST" class="form" id="producerSignupForm">
+                <h2 class="form__title">Producer Sign Up</h2>
+                <p class="form__subtitle">Register your company account</p>
+                <input type="hidden" name="user_type" value="producer">
+                <input type="text" name="username" placeholder="Username" class="input" 
+                       pattern="^[a-zA-Z0-9_]{3,15}$" 
+                       title="Username: 3-15 characters, letters, numbers, underscores only" 
+                       required />
+                <input type="password" name="password" placeholder="Password (min 5 chars)" class="input" 
+                       minlength="5"
+                       required />
+                <input type="text" name="company_name" placeholder="Company Name (e.g., Apple, Samsung)" class="input" required />
+                <button type="submit" class="btn">Sign Up</button>
+                <p class="form__link">Already have an account? <a href="{{ url_for('login') }}">Sign In</a></p>
+            </form>
+        </div>
+
+        <!-- Consumer Sign Up -->
+        <div class="container__form container--signin">
+            <form action="{{ url_for('signup') }}" method="POST" class="form" id="consumerSignupForm">
+                <h2 class="form__title">Consumer Sign Up</h2>
+                <p class="form__subtitle">Create your account to browse and review</p>
+                <input type="hidden" name="user_type" value="consumer">
+                <input type="text" name="username" placeholder="Username" class="input" 
+                       pattern="^[a-zA-Z0-9_]{3,15}$" 
+                       title="Username: 3-15 characters, letters, numbers, underscores only" 
+                       required />
+                <input type="password" name="password" placeholder="Password (min 5 chars)" class="input" 
+                       minlength="5"
+                       required />
+                <button type="submit" class="btn">Sign Up</button>
+                <p class="form__link">Already have an account? <a href="{{ url_for('login') }}">Sign In</a></p>
+            </form>
+        </div>
+
+        <!-- Overlay -->
+        <div class="container__overlay">
+            <div class="overlay">
+                <div class="overlay__panel overlay--left">
+                    <h3>Consumer?</h3>
+                    <p>Create an account to browse and review products</p>
+                    <button class="btn btn--transparent" id="signIn">Consumer Sign Up</button>
+                </div>
+                <div class="overlay__panel overlay--right">
+                    <h3>Producer?</h3>
+                    <p>Register your company to list products</p>
+                    <button class="btn btn--transparent" id="signUp">Producer Sign Up</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="home-link">
+        <a href="{{ url_for('home') }}">← Back to Home</a>
+    </div>
+</body>
+</html>

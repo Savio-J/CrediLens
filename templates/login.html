@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{{ url_for('static', filename='login.css') }}">
+    <link rel="icon" type="image/jpeg" href="{{ url_for('static', filename='last.jpg') }}">
+    <script defer src="{{ url_for('static', filename='login.js') }}"></script>
+    <title>CrediLens | Login</title>
+</head>
+<body>
+    <!-- Notification area -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+      <div class="notification">
+        <ul>
+        {% for category, message in messages %}
+          <li class="{{ category }}" style="font-weight: bold; color: {% if category == 'error' %}#ff6b6b{% else %}#51cf66{% endif %};">{{ message }}</li>
+        {% endfor %}
+        </ul>
+      </div>
+    {% endif %}
+    {% endwith %}
+    
+    <div class="container right-panel-active">
+        <!-- Producer Login -->
+        <div class="container__form container--signup">
+            <form action="{{ url_for('login') }}" method="POST" class="form" id="producerForm">
+                <h2 class="form__title">Producer Login</h2>
+                <p class="form__subtitle">Access your company dashboard</p>
+                <input type="hidden" name="user_type" value="producer">
+                <input type="text" name="username" placeholder="Username" class="input" required />
+                <input type="password" name="password" placeholder="Password" class="input" required />
+                <div class="remember-me">
+                    <label class="checkbox-label">
+                        <input type="checkbox" name="remember_me" />
+                        <span>Remember me for 7 days</span>
+                    </label>
+                </div>
+                <button type="submit" class="btn">Sign In</button>
+                <p class="form__link">Don't have an account? <a href="{{ url_for('signup') }}">Sign Up</a></p>
+            </form>
+        </div>
+
+        <!-- Consumer Login -->
+        <div class="container__form container--signin">
+            <form action="{{ url_for('login') }}" method="POST" class="form" id="consumerForm">
+                <h2 class="form__title">Consumer Login</h2>
+                <p class="form__subtitle">Browse and review products</p>
+                <input type="hidden" name="user_type" value="consumer">
+                <input type="text" name="username" placeholder="Username" class="input" required />
+                <input type="password" name="password" placeholder="Password" class="input" required />
+                <div class="remember-me">
+                    <label class="checkbox-label">
+                        <input type="checkbox" name="remember_me" />
+                        <span>Remember me for 7 days</span>
+                    </label>
+                </div>
+                <button type="submit" class="btn">Sign In</button>
+                <p class="form__link">Don't have an account? <a href="{{ url_for('signup') }}">Sign Up</a></p>
+            </form>
+        </div>
+
+        <!-- Overlay -->
+        <div class="container__overlay">
+            <div class="overlay">
+                <div class="overlay__panel overlay--left">
+                    <h3>Consumer?</h3>
+                    <p>Browse products and share your reviews</p>
+                    <button class="btn btn--transparent" id="signIn">Consumer Login</button>
+                </div>
+                <div class="overlay__panel overlay--right">
+                    <h3>Producer?</h3>
+                    <p>Manage your company's products</p>
+                    <button class="btn btn--transparent" id="signUp">Producer Login</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="home-link">
+        <a href="{{ url_for('home') }}">← Back to Home</a>
+    </div>
+</body>
+</html>

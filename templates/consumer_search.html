@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="flex flex-col lg:flex-row gap-8">
+    
+    <!-- Sidebar: Priorities -->
+    <div class="w-full lg:w-1/4">
+        <div class="glass-panel p-6 sticky top-24">
+            <h3 class="font-bold text-gray-900 mb-4 flex items-center">
+                <svg class="w-5 h-5 mr-2 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"></path></svg>
+                Adjust Priorities
+            </h3>
+            <p class="text-xs text-gray-500 mb-6">What matters most to you?</p>
+            
+            <div class="space-y-4">
+                <!-- Sliders (Visual Only) -->
+                <div><label class="text-xs font-semibold uppercase text-gray-500">Processor</label><input type="range" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"></div>
+                <div><label class="text-xs font-semibold uppercase text-gray-500">Camera</label><input type="range" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"></div>
+                <div><label class="text-xs font-semibold uppercase text-gray-500">Battery</label><input type="range" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"></div>
+                <div><label class="text-xs font-semibold uppercase text-gray-500">Price</label><input type="range" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"></div>
+            </div>
+            
+            <button class="w-full mt-6 bg-blue-600 text-white py-2 rounded-md text-sm font-medium hover:bg-blue-700 transition">Apply & Re-Score</button>
+        </div>
+    </div>
+
+    <!-- Main Search Area -->
+    <div class="w-full lg:w-3/4">
+        <div class="mb-6 flex gap-2">
+            <input type="text" placeholder="Search for a smartphone..." class="flex-grow rounded-lg border-gray-300 p-3 shadow-sm border focus:ring-blue-500 focus:border-blue-500">
+            <button class="bg-gray-800 text-white px-6 rounded-lg font-medium hover:bg-gray-900 transition">Search</button>
+        </div>
+
+        <!-- Result Cards (Dummy) -->
+        <div class="space-y-4">
+            <!-- Card 1 -->
+            <div class="glass-panel p-6 flex justify-between items-center hover:shadow-md transition">
+                <div>
+                    <h4 class="text-xl font-bold text-gray-900">Galaxy Ultra X1</h4>
+                    <p class="text-sm text-gray-500">Snapdragon 8 Gen 2 | 12GB RAM | 5000mAh</p>
+                </div>
+                <div class="text-right">
+                    <div class="text-2xl font-bold text-green-600">92.4</div>
+                    <div class="text-xs text-gray-400 uppercase font-semibold">Credibility Score</div>
+                </div>
+            </div>
+
+            <!-- Card 2 -->
+            <div class="glass-panel p-6 flex justify-between items-center hover:shadow-md transition">
+                <div>
+                    <h4 class="text-xl font-bold text-gray-900">Pixel Pro 9</h4>
+                    <p class="text-sm text-gray-500">Tensor G4 | 8GB RAM | 4800mAh</p>
+                </div>
+                <div class="text-right">
+                    <div class="text-2xl font-bold text-green-500">88.1</div>
+                    <div class="text-xs text-gray-400 uppercase font-semibold">Credibility Score</div>
+                </div>
+            </div>
+             <!-- Card 3 -->
+            <div class="glass-panel p-6 flex justify-between items-center hover:shadow-md transition">
+                <div>
+                    <h4 class="text-xl font-bold text-gray-900">Budget King Z</h4>
+                    <p class="text-sm text-gray-500">Helio G99 | 4GB RAM | 6000mAh</p>
+                </div>
+                <div class="text-right">
+                    <div class="text-2xl font-bold text-yellow-500">65.0</div>
+                    <div class="text-xs text-gray-400 uppercase font-semibold">Credibility Score</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
