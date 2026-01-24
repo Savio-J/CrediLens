@@ -1,6 +1,7 @@
 """
 Custom Credibility Scoring Engine
 Allows users to customize weights for their own priorities.
+Uses continuous percentile ranking for proportional scoring.
 Does NOT modify the ideal_score in the database.
 """
 import pandas as pd
@@ -8,7 +9,7 @@ from typing import List, Dict, Optional
 
 
 class CustomCredibilityScorer:
-    """Calculate custom credibility scores with user-defined weights."""
+    """Calculate custom credibility scores with user-defined weights using continuous scoring."""
     
     def __init__(self, custom_weights: Optional[Dict[str, int]] = None):
         # Default weights (same as original scoring)
@@ -28,13 +29,13 @@ class CustomCredibilityScorer:
         
         # Lower is better for these columns
         self.smaller_is_better = ["price_usd", "weight_g"]
-        
-        # Quantile breakpoints
-        self.quantiles = [0.25, 0.5, 0.75]
     
     def calculate_scores(self, products: List[Dict]) -> pd.DataFrame:
         """
-        Calculate scores for a list of products using custom weights.
+        Calculate scores for a list of products using custom weights and continuous percentile ranking.
+        
+        Each spec contributes: weight × percentile_rank (0.0 to 1.0)
+        Final score normalized to 0-100 scale.
         
         Args:
             products: List of product dicts with spec keys
@@ -52,13 +53,12 @@ class CustomCredibilityScorer:
                                 if k in df.columns}
         
         if not available_score_cols:
-            # No scoreable columns
             df['custom_score'] = None
             return df
         
         score_cols = list(available_score_cols.keys())
         
-        # Convert to numeric and drop rows with ALL missing scoring data
+        # Convert to numeric
         df[score_cols] = df[score_cols].apply(pd.to_numeric, errors='coerce')
         
         # Only score products that have at least SOME data
@@ -69,39 +69,41 @@ class CustomCredibilityScorer:
             return df
         
         # Initialize score column
-        df_to_score['custom_score'] = 0
+        df_to_score['custom_score'] = 0.0
         
-        # Calculate quantiles (only on non-null values)
-        quantiles_df = df_to_score[score_cols].quantile(self.quantiles)
+        # Track actual weight used (in case some columns are missing)
+        df_to_score['weight_used'] = 0.0
         
-        # Score each product
-        for idx in df_to_score.index:
-            for quantile in self.quantiles:
-                for col, weight in available_score_cols.items():
-                    val = df_to_score.at[idx, col]
-                    
-                    # Skip if value is missing
-                    if pd.isna(val):
-                        continue
-                    
-                    q_val = quantiles_df.at[quantile, col]
-                    
-                    # Skip if quantile is NaN
-                    if pd.isna(q_val):
-                        continue
-                    
-                    # Score based on whether smaller is better
-                    if col in self.smaller_is_better:
-                        if val <= q_val:
-                            df_to_score.at[idx, 'custom_score'] += weight
-                    else:
-                        if val >= q_val:
-                            df_to_score.at[idx, 'custom_score'] += weight
+        # Calculate continuous percentile scores for each column
+        for col, weight in available_score_cols.items():
+            # Skip if column has no valid values
+            if df_to_score[col].notna().sum() == 0:
+                continue
+            
+            # Calculate percentile rank (0.0 to 1.0)
+            # For "smaller is better" columns, invert the ranking
+            if col in self.smaller_is_better:
+                # Lower values get higher percentile (invert)
+                percentiles = 1 - df_to_score[col].rank(pct=True, na_option='keep')
+            else:
+                # Higher values get higher percentile
+                percentiles = df_to_score[col].rank(pct=True, na_option='keep')
+            
+            # Add weighted percentile to score (only for non-null values)
+            mask = df_to_score[col].notna()
+            df_to_score.loc[mask, 'custom_score'] += percentiles[mask] * weight
+            df_to_score.loc[mask, 'weight_used'] += weight
         
-        # Normalize to 0-100 scale
-        max_score = df_to_score['custom_score'].max()
-        if max_score > 0:
-            df_to_score['custom_score'] = (df_to_score['custom_score'] / max_score) * 100
+        # Normalize to 0-100 scale based on weight used
+        df_to_score['custom_score'] = (
+            df_to_score['custom_score'] / df_to_score['weight_used'].clip(lower=1)
+        ) * 100
+        
+        # Round to 2 decimal places
+        df_to_score['custom_score'] = df_to_score['custom_score'].round(2)
+        
+        # Clean up temp column
+        df_to_score = df_to_score.drop(columns=['weight_used'])
         
         # Merge scores back to original dataframe
         df.loc[df_to_score.index, 'custom_score'] = df_to_score['custom_score']

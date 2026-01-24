@@ -39,8 +39,8 @@ def get_web3_connection():
         w3 = Web3(Web3.HTTPProvider(SEPOLIA_RPC.format(api_key=api_key)))
         if w3.is_connected():
             return w3
-    except Exception as e:
-        print(f"Blockchain connection error: {e}")
+    except Exception:
+        pass  # Connection failed, return None
     
     return None
 

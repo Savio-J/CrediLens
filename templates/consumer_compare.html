@@ -1,0 +1,441 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="max-w-7xl mx-auto">
+    <!-- Back Button -->
+    <a href="/consumer" class="text-gray-500 hover:text-blue-600 mb-6 inline-block flex items-center">
+        <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg> 
+        Back to Products
+    </a>
+
+    <!-- Header -->
+    <div class="mb-8">
+        <h2 class="text-3xl font-bold text-gray-900 mb-2">Compare Products</h2>
+        <p class="text-gray-500">Select up to 3 products to compare side by side</p>
+    </div>
+
+    <!-- Product Selector -->
+    <div class="glass-panel p-6 mb-8">
+        <h3 class="font-bold text-gray-900 mb-4 flex items-center">
+            <svg class="w-5 h-5 mr-2 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path></svg>
+            Select Products to Compare
+        </h3>
+        
+        <div class="flex flex-wrap gap-4 items-center">
+            <!-- Product Selector Dropdowns -->
+            <div class="flex-1 min-w-[200px]">
+                <select id="product1" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                    <option value="">Select Product 1</option>
+                    {% for product in all_products %}
+                    <option value="{{ product.id }}" {% if product.id in selected_ids %}selected{% endif %}>
+                        {{ product.product_name }} ({{ product.company_name }})
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+            
+            <div class="flex-1 min-w-[200px]">
+                <select id="product2" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                    <option value="">Select Product 2</option>
+                    {% for product in all_products %}
+                    <option value="{{ product.id }}" {% if product.id in selected_ids and loop.index > 1 %}selected{% endif %}>
+                        {{ product.product_name }} ({{ product.company_name }})
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+            
+            <div class="flex-1 min-w-[200px]">
+                <select id="product3" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                    <option value="">Select Product 3 (Optional)</option>
+                    {% for product in all_products %}
+                    <option value="{{ product.id }}">
+                        {{ product.product_name }} ({{ product.company_name }})
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+            
+            <button onclick="compareProducts()" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-medium transition flex items-center">
+                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
+                Compare
+            </button>
+        </div>
+    </div>
+
+    {% if comparison_data %}
+    <!-- Comparison Table -->
+    <div class="glass-panel overflow-hidden">
+        <!-- Product Headers -->
+        <div class="grid grid-cols-{{ comparison_data|length + 1 }} border-b border-gray-200">
+            <div class="p-4 bg-gray-50 font-bold text-gray-600">Specification</div>
+            {% for item in comparison_data %}
+            <div class="p-4 bg-gray-50 text-center border-l border-gray-200">
+                <h3 class="font-bold text-lg text-gray-900">{{ item.product.product_name }}</h3>
+                <p class="text-sm text-gray-500">{{ item.product.company_name }}</p>
+                <a href="/consumer/product/{{ item.product.id }}" class="text-blue-600 text-xs hover:underline">View Details →</a>
+            </div>
+            {% endfor %}
+        </div>
+
+        <!-- Score Row -->
+        <div class="grid grid-cols-{{ comparison_data|length + 1 }} border-b border-gray-200 bg-blue-50">
+            <div class="p-4 font-semibold text-gray-700 flex items-center">
+                <svg class="w-5 h-5 mr-2 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"></path></svg>
+                Credibility Score
+            </div>
+            {% for item in comparison_data %}
+            {% set score = item.product.ideal_score %}
+            <div class="p-4 text-center border-l border-gray-200">
+                {% if score >= 70 %}
+                <span class="inline-block bg-green-100 text-green-800 px-4 py-2 rounded-lg font-bold text-2xl">{{ "%.1f"|format(score) }}</span>
+                {% elif score >= 50 %}
+                <span class="inline-block bg-yellow-100 text-yellow-800 px-4 py-2 rounded-lg font-bold text-2xl">{{ "%.1f"|format(score) }}</span>
+                {% else %}
+                <span class="inline-block bg-red-100 text-red-800 px-4 py-2 rounded-lg font-bold text-2xl">{{ "%.1f"|format(score) }}</span>
+                {% endif %}
+            </div>
+            {% endfor %}
+        </div>
+
+        <!-- Price Row -->
+        <div class="grid grid-cols-{{ comparison_data|length + 1 }} border-b border-gray-200">
+            <div class="p-4 font-semibold text-gray-700">💰 Price</div>
+            {% set prices = comparison_data|map(attribute='product.price_usd')|list %}
+            {% set min_price = prices|min %}
+            {% for item in comparison_data %}
+            <div class="p-4 text-center border-l border-gray-200">
+                <span class="font-bold text-lg {% if item.product.price_usd == min_price %}text-green-600{% endif %}">
+                    ${{ "%.0f"|format(item.product.price_usd or 0) }}
+                </span>
+                {% if item.product.price_usd == min_price and comparison_data|length > 1 %}
+                <span class="ml-2 text-xs bg-green-100 text-green-700 px-2 py-1 rounded">Best</span>
+                {% endif %}
+            </div>
+            {% endfor %}
+        </div>
+
+        <!-- Processor Score -->
+        <div class="grid grid-cols-{{ comparison_data|length + 1 }} border-b border-gray-200 bg-gray-50">
+            <div class="p-4 font-semibold text-gray-700">⚡ Processor Score</div>
+            {% set vals = comparison_data|map(attribute='product.processor_score')|list %}
+            {% set max_val = vals|max %}
+            {% for item in comparison_data %}
+            <div class="p-4 text-center border-l border-gray-200">
+                <span class="font-medium {% if item.product.processor_score == max_val and comparison_data|length > 1 %}text-green-600 font-bold{% endif %}">
+                    {{ item.product.processor_score|int if item.product.processor_score else 'N/A' }}
+                </span>
+                {% if item.product.processor_score == max_val and comparison_data|length > 1 %}
+                <span class="ml-2 text-xs bg-green-100 text-green-700 px-2 py-1 rounded">Best</span>
+                {% endif %}
+            </div>
+            {% endfor %}
+        </div>
+
+        <!-- RAM -->
+        <div class="grid grid-cols-{{ comparison_data|length + 1 }} border-b border-gray-200">
+            <div class="p-4 font-semibold text-gray-700">🧠 RAM</div>
+            {% set vals = comparison_data|map(attribute='product.ram_gb')|list %}
+            {% set max_val = vals|max %}
+            {% for item in comparison_data %}
+            <div class="p-4 text-center border-l border-gray-200">
+                <span class="font-medium {% if item.product.ram_gb == max_val and comparison_data|length > 1 %}text-green-600 font-bold{% endif %}">
+                    {{ item.product.ram_gb }} GB
+                </span>
+                {% if item.product.ram_gb == max_val and comparison_data|length > 1 %}
+                <span class="ml-2 text-xs bg-green-100 text-green-700 px-2 py-1 rounded">Best</span>
+                {% endif %}
+            </div>
+            {% endfor %}
+        </div>
+
+        <!-- Storage -->
+        <div class="grid grid-cols-{{ comparison_data|length + 1 }} border-b border-gray-200 bg-gray-50">
+            <div class="p-4 font-semibold text-gray-700">💾 Storage</div>
+            {% set vals = comparison_data|map(attribute='product.storage_gb')|list %}
+            {% set max_val = vals|max %}
+            {% for item in comparison_data %}
+            <div class="p-4 text-center border-l border-gray-200">
+                <span class="font-medium {% if item.product.storage_gb == max_val and comparison_data|length > 1 %}text-green-600 font-bold{% endif %}">
+                    {{ item.product.storage_gb }} GB
+                </span>
+                {% if item.product.storage_gb == max_val and comparison_data|length > 1 %}
+                <span class="ml-2 text-xs bg-green-100 text-green-700 px-2 py-1 rounded">Best</span>
+                {% endif %}
+            </div>
+            {% endfor %}
+        </div>
+
+        <!-- Battery -->
+        <div class="grid grid-cols-{{ comparison_data|length + 1 }} border-b border-gray-200">
+            <div class="p-4 font-semibold text-gray-700">🔋 Battery</div>
+            {% set vals = comparison_data|map(attribute='product.battery_mah')|list %}
+            {% set max_val = vals|max %}
+            {% for item in comparison_data %}
+            <div class="p-4 text-center border-l border-gray-200">
+                <span class="font-medium {% if item.product.battery_mah == max_val and comparison_data|length > 1 %}text-green-600 font-bold{% endif %}">
+                    {{ item.product.battery_mah|int }} mAh
+                </span>
+                {% if item.product.battery_mah == max_val and comparison_data|length > 1 %}
+                <span class="ml-2 text-xs bg-green-100 text-green-700 px-2 py-1 rounded">Best</span>
+                {% endif %}
+            </div>
+            {% endfor %}
+        </div>
+
+        <!-- Screen Size -->
+        <div class="grid grid-cols-{{ comparison_data|length + 1 }} border-b border-gray-200 bg-gray-50">
+            <div class="p-4 font-semibold text-gray-700">📱 Screen Size</div>
+            {% set vals = comparison_data|map(attribute='product.screen_inches')|list %}
+            {% set max_val = vals|max %}
+            {% for item in comparison_data %}
+            <div class="p-4 text-center border-l border-gray-200">
+                <span class="font-medium {% if item.product.screen_inches == max_val and comparison_data|length > 1 %}text-green-600 font-bold{% endif %}">
+                    {{ item.product.screen_inches }}"
+                </span>
+                {% if item.product.screen_inches == max_val and comparison_data|length > 1 %}
+                <span class="ml-2 text-xs bg-green-100 text-green-700 px-2 py-1 rounded">Best</span>
+                {% endif %}
+            </div>
+            {% endfor %}
+        </div>
+
+        <!-- Camera -->
+        <div class="grid grid-cols-{{ comparison_data|length + 1 }} border-b border-gray-200">
+            <div class="p-4 font-semibold text-gray-700">📷 Camera</div>
+            {% set vals = comparison_data|map(attribute='product.camera_mp')|list %}
+            {% set max_val = vals|max %}
+            {% for item in comparison_data %}
+            <div class="p-4 text-center border-l border-gray-200">
+                <span class="font-medium {% if item.product.camera_mp == max_val and comparison_data|length > 1 %}text-green-600 font-bold{% endif %}">
+                    {{ item.product.camera_mp|int }} MP
+                </span>
+                {% if item.product.camera_mp == max_val and comparison_data|length > 1 %}
+                <span class="ml-2 text-xs bg-green-100 text-green-700 px-2 py-1 rounded">Best</span>
+                {% endif %}
+            </div>
+            {% endfor %}
+        </div>
+
+        <!-- Weight -->
+        <div class="grid grid-cols-{{ comparison_data|length + 1 }} border-b border-gray-200 bg-gray-50">
+            <div class="p-4 font-semibold text-gray-700">⚖️ Weight</div>
+            {% set vals = comparison_data|map(attribute='product.weight_g')|list %}
+            {% set min_val = vals|min %}
+            {% for item in comparison_data %}
+            <div class="p-4 text-center border-l border-gray-200">
+                <span class="font-medium {% if item.product.weight_g == min_val and comparison_data|length > 1 %}text-green-600 font-bold{% endif %}">
+                    {{ item.product.weight_g|int }} g
+                </span>
+                {% if item.product.weight_g == min_val and comparison_data|length > 1 %}
+                <span class="ml-2 text-xs bg-green-100 text-green-700 px-2 py-1 rounded">Lightest</span>
+                {% endif %}
+            </div>
+            {% endfor %}
+        </div>
+
+        <!-- User Reviews Section -->
+        <div class="grid grid-cols-{{ comparison_data|length + 1 }} border-b border-gray-200">
+            <div class="p-4 font-semibold text-gray-700">⭐ Avg Rating</div>
+            {% set vals = comparison_data|map(attribute='avg_rating')|list %}
+            {% set max_val = vals|max %}
+            {% for item in comparison_data %}
+            <div class="p-4 text-center border-l border-gray-200">
+                <span class="font-medium {% if item.avg_rating == max_val and comparison_data|length > 1 and item.avg_rating > 0 %}text-green-600 font-bold{% endif %}">
+                    {% if item.avg_rating > 0 %}
+                    {{ item.avg_rating }}/5 ({{ item.review_count }} reviews)
+                    {% else %}
+                    No reviews yet
+                    {% endif %}
+                </span>
+            </div>
+            {% endfor %}
+        </div>
+
+        <!-- Review Credibility -->
+        <div class="grid grid-cols-{{ comparison_data|length + 1 }} bg-gray-50">
+            <div class="p-4 font-semibold text-gray-700">🛡️ Review Credibility</div>
+            {% for item in comparison_data %}
+            <div class="p-4 text-center border-l border-gray-200">
+                {% if item.review_count > 0 %}
+                <span class="font-medium {% if item.credibility_pct >= 80 %}text-green-600{% elif item.credibility_pct >= 50 %}text-yellow-600{% else %}text-red-600{% endif %}">
+                    {{ item.credibility_pct|int }}% Genuine
+                </span>
+                {% else %}
+                <span class="text-gray-400">N/A</span>
+                {% endif %}
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- Radar Chart -->
+    <div class="glass-panel p-6 mt-8">
+        <h3 class="font-bold text-gray-900 mb-2">Visual Comparison</h3>
+        <p class="text-sm text-gray-500 mb-4">Each axis shows relative performance (0-100%). Hover over points to see actual values.</p>
+        <div class="flex justify-center">
+            <div style="width: 400px; height: 400px;">
+                <canvas id="comparisonChart"></canvas>
+            </div>
+        </div>
+        <div class="mt-4 text-center text-xs text-gray-400">
+            <span class="inline-block mr-4">📊 Larger area = Better overall specs</span>
+            <span class="inline-block">💡 100% = Best among compared products</span>
+        </div>
+    </div>
+
+    {% else %}
+    <!-- Empty State -->
+    <div class="glass-panel p-12 text-center">
+        <svg class="w-16 h-16 mx-auto text-gray-400 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
+        <h3 class="text-xl font-bold text-gray-900 mb-2">No Products Selected</h3>
+        <p class="text-gray-500">Use the dropdowns above to select products to compare</p>
+    </div>
+    {% endif %}
+</div>
+
+<!-- Chart.js CDN -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+function compareProducts() {
+    const p1 = document.getElementById('product1').value;
+    const p2 = document.getElementById('product2').value;
+    const p3 = document.getElementById('product3').value;
+    
+    const ids = [p1, p2, p3].filter(id => id !== '');
+    
+    if (ids.length < 2) {
+        alert('Please select at least 2 products to compare');
+        return;
+    }
+    
+    window.location.href = '/consumer/compare?ids=' + ids.join(',');
+}
+
+{% if comparison_data %}
+// Radar Chart
+const ctx = document.getElementById('comparisonChart').getContext('2d');
+
+// Store actual values for tooltips
+const products = [
+    {% for item in comparison_data %}
+    {
+        name: "{{ item.product.product_name }}",
+        processor: {{ item.product.processor_score or 0 }},
+        ram: {{ item.product.ram_gb or 0 }},
+        storage: {{ item.product.storage_gb or 0 }},
+        battery: {{ item.product.battery_mah or 0 }},
+        camera: {{ item.product.camera_mp or 0 }},
+        screen: {{ item.product.screen_inches or 0 }},
+    },
+    {% endfor %}
+];
+
+// Store actual values for tooltips
+const actualValues = products.map(p => ({
+    name: p.name,
+    values: {
+        'Processor': p.processor + ' pts',
+        'RAM': p.ram + ' GB',
+        'Storage': p.storage + ' GB',
+        'Battery': p.battery + ' mAh',
+        'Camera': p.camera + ' MP',
+        'Screen': p.screen + '"'
+    }
+}));
+
+// Find max values for normalization (use sensible minimums to avoid division issues)
+const maxProcessor = Math.max(...products.map(p => p.processor), 1);
+const maxRam = Math.max(...products.map(p => p.ram), 1);
+const maxStorage = Math.max(...products.map(p => p.storage), 1);
+const maxBattery = Math.max(...products.map(p => p.battery), 1);
+const maxCamera = Math.max(...products.map(p => p.camera), 1);
+const maxScreen = Math.max(...products.map(p => p.screen), 1);
+
+// More distinct colors with higher opacity
+const colors = [
+    { bg: 'rgba(59, 130, 246, 0.2)', border: 'rgb(59, 130, 246)' },   // Blue
+    { bg: 'rgba(16, 185, 129, 0.2)', border: 'rgb(16, 185, 129)' },   // Green
+    { bg: 'rgba(245, 158, 11, 0.2)', border: 'rgb(245, 158, 11)' },   // Orange
+];
+
+const datasets = products.map((p, i) => ({
+    label: p.name,
+    data: [
+        Math.round((p.processor / maxProcessor) * 100) || 0,
+        Math.round((p.ram / maxRam) * 100) || 0,
+        Math.round((p.storage / maxStorage) * 100) || 0,
+        Math.round((p.battery / maxBattery) * 100) || 0,
+        Math.round((p.camera / maxCamera) * 100) || 0,
+        Math.round((p.screen / maxScreen) * 100) || 0,
+    ],
+    backgroundColor: colors[i].bg,
+    borderColor: colors[i].border,
+    borderWidth: 2,
+    pointBackgroundColor: colors[i].border,
+}));
+
+const labels = ['Processor', 'RAM', 'Storage', 'Battery', 'Camera', 'Screen'];
+
+new Chart(ctx, {
+    type: 'radar',
+    data: {
+        labels: labels,
+        datasets: datasets
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        scales: {
+            r: {
+                beginAtZero: true,
+                max: 100,
+                ticks: {
+                    stepSize: 20
+                }
+            }
+        },
+        plugins: {
+            legend: {
+                position: 'bottom'
+            },
+            tooltip: {
+                callbacks: {
+                    label: function(context) {
+                        const productIndex = context.datasetIndex;
+                        const labelIndex = context.dataIndex;
+                        const label = labels[labelIndex];
+                        const actualValue = actualValues[productIndex].values[label];
+                        const percentValue = context.raw;
+                        return `${context.dataset.label}: ${actualValue} (${percentValue}%)`;
+                    }
+                }
+            }
+        }
+    }
+});
+{% endif %}
+
+// Pre-select products from URL
+document.addEventListener('DOMContentLoaded', function() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const ids = urlParams.get('ids');
+    
+    if (ids) {
+        const idArray = ids.split(',');
+        if (idArray[0]) document.getElementById('product1').value = idArray[0];
+        if (idArray[1]) document.getElementById('product2').value = idArray[1];
+        if (idArray[2]) document.getElementById('product3').value = idArray[2];
+    }
+});
+</script>
+
+<style>
+.glass-panel {
+    background: rgba(255, 255, 255, 0.9);
+    backdrop-filter: blur(10px);
+    border-radius: 1rem;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+}
+</style>
+{% endblock %}

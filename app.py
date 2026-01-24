@@ -144,24 +144,20 @@ If no phone is visible, set "identified" to false."""
         url = f"https://generativelanguage.googleapis.com/v1beta/models/{model_name}:generateContent?key={api_key}"
         
         try:
-            print(f"Trying Gemini model: {model_name}")
             response = requests.post(url, json=body, timeout=30)
             
             # If 404 or 429, try next model
             if response.status_code == 404:
-                print(f"Model {model_name} not found, trying next...")
                 last_error = f"Model {model_name} not available"
                 continue
             
             if response.status_code == 429:
-                print(f"Rate limited on {model_name}, trying next...")
                 last_error = f"Rate limited - please wait a moment and try again"
                 continue
                 
             response.raise_for_status()
             
             result = response.json()
-            print(f"Raw API response: {result}")
             
             # Extract the text response
             if "candidates" in result and len(result["candidates"]) > 0:
@@ -170,7 +166,6 @@ If no phone is visible, set "identified" to false."""
                 # Check for safety blocks
                 if "content" not in candidate:
                     finish_reason = candidate.get("finishReason", "unknown")
-                    print(f"No content in response, finish reason: {finish_reason}")
                     if finish_reason == "SAFETY":
                         last_error = "Image was blocked by safety filters. Try a clearer photo."
                         continue
@@ -178,7 +173,6 @@ If no phone is visible, set "identified" to false."""
                     continue
                 
                 text = candidate["content"]["parts"][0]["text"]
-                print(f"AI Response text: {text}")
                 
                 # Parse JSON from response (handle markdown code blocks)
                 text = text.strip()
@@ -194,11 +188,8 @@ If no phone is visible, set "identified" to false."""
                 import re
                 try:
                     parsed = json.loads(text)
-                    print(f"Successfully identified with {model_name}: {parsed}")
                     return parsed
                 except json.JSONDecodeError as je:
-                    print(f"JSON parse error: {je}, trying to extract fields manually")
-                    
                     # Try to extract brand and model from truncated JSON
                     brand_match = re.search(r'"brand"\s*:\s*"([^"]+)"', text)
                     model_match = re.search(r'"model"\s*:\s*"([^"]*)', text)
@@ -206,7 +197,6 @@ If no phone is visible, set "identified" to false."""
                     if brand_match:
                         brand = brand_match.group(1)
                         model = model_match.group(1) if model_match else "Unknown"
-                        print(f"Extracted from partial response: brand={brand}, model={model}")
                         return {
                             "identified": True,
                             "brand": brand,
@@ -225,11 +215,9 @@ If no phone is visible, set "identified" to false."""
             
         except requests.exceptions.RequestException as e:
             last_error = str(e)
-            print(f"Error with {model_name}: {last_error}")
             continue
         except Exception as e:
             last_error = str(e)
-            print(f"Exception with {model_name}: {last_error}")
             continue
     
     # All models failed
@@ -262,9 +250,6 @@ def match_phone_in_database(brand, model):
     # Extract model series/number (e.g., "M32", "S24", "15 Pro", "A55")
     model_identifier = re.findall(r'[a-zA-Z]?\d+(?:\s*(?:pro|max|ultra|plus|mini|lite|fe|s|e))*', model_lower, re.IGNORECASE)
     model_identifier_str = ' '.join(model_identifier).strip()
-    
-    print(f"[AI Scanner] Looking for: Brand='{brand}', Model='{model}'")
-    print(f"[AI Scanner] Model identifier extracted: '{model_identifier_str}'")
     
     for product in products:
         score = 0
@@ -331,23 +316,13 @@ def match_phone_in_database(brand, model):
         if score > best_score:
             best_score = score
             best_match = product
-            print(f"[AI Scanner] Candidate: '{product.product_name}' score={score}")
-    
-    print(f"[AI Scanner] Best match: '{best_match.product_name if best_match else 'None'}' with score={best_score}")
     
     # STRICT THRESHOLD: Require high confidence match
     # Brand match alone (30) is NOT enough
     # Need brand (30) + at least model number match (40) + series match (50) = 120 for confident match
     # Minimum threshold of 100 ensures we have more than just brand match
     if best_score >= 100:
-        print(f"[AI Scanner] ✓ Match found: {best_match.product_name}")
         return best_match
-    
-    # If brand matched but score too low, the phone model doesn't exist in our database
-    if brand_matched:
-        print(f"[AI Scanner] ✗ Brand '{brand}' found but model '{model}' not in database (score={best_score} < 100)")
-    else:
-        print(f"[AI Scanner] ✗ Brand '{brand}' not found in database")
     
     return None
 
@@ -376,7 +351,7 @@ try:
         api_key=os.environ.get("HF_TOKEN"),
     )
 except Exception as e:
-    print(f"Warning: Hugging Face client not initialized: {e}")
+    pass  # HF client initialization failed, will retry on first use
 
 # Emotion to score mapping (1-5 scale)
 # Based on michellejieli/emotion_text_classifier model outputs
@@ -409,7 +384,6 @@ def analyze_emotion(text):
     }
     
     if not text:
-        print("No text provided for emotion analysis")
         return default_result
     
     # Ensure HF client is initialized and has a token
@@ -419,17 +393,12 @@ def analyze_emotion(text):
         if token:
             try:
                 hf_client = InferenceClient(provider="hf-inference", api_key=token)
-                print("HF client initialized/reinitialized with token from environment.")
             except Exception as e:
-                print(f"Failed to initialize HF client: {e}")
                 hf_client = None
         else:
-            print("WARNING: HF client not initialized. Check HF_TOKEN environment variable.")
             return default_result
     
     try:
-        print(f"\n{'='*60}")
-        print(f"Analyzing emotion for text: '{text[:100]}{'...' if len(text) > 100 else ''}'")
         result = hf_client.text_classification(
             text,
             model="michellejieli/emotion_text_classifier",
@@ -437,7 +406,6 @@ def analyze_emotion(text):
         
         # Store all emotions with their scores
         all_emotions = []
-        print("All detected emotions:")
         for item in result:
             label = item.get('label', 'unknown').lower()
             conf = item.get('score', 0)
@@ -447,7 +415,6 @@ def analyze_emotion(text):
                 'confidence': conf,
                 'mapped_score': mapped_score
             })
-            print(f"  - {label.upper()}: {conf:.1%} confidence → {mapped_score}/5 score")
         
         if result and len(result) > 0:
             # Get the top emotion (highest confidence)
@@ -456,9 +423,6 @@ def analyze_emotion(text):
             confidence = top_emotion.get('score', 0)
             emotion_score = EMOTION_SCORES.get(emotion_label, 3.0)
             
-            print(f"\n✓ Primary emotion: {emotion_label.upper()} ({confidence:.1%} confidence) → {emotion_score}/5")
-            print(f"{'='*60}\n")
-            
             return {
                 'score': emotion_score,
                 'label': emotion_label,
@@ -466,9 +430,7 @@ def analyze_emotion(text):
                 'all_emotions': all_emotions
             }
     except Exception as e:
-        print(f"Emotion analysis error: {e}")
-        import traceback
-        traceback.print_exc()
+        pass  # Emotion analysis failed, return default
     
     return default_result
 
@@ -511,21 +473,18 @@ def calculate_review_credibility(user_ratings_avg, emotion_result):
         credibility = 0.9 + (confidence * 0.1)  # 0.9 to 1.0
         flag = 'genuine'
         adjustment = confidence * 0.3  # Small bonus for consistent reviews
-        print(f"  ✓ CONSISTENT: {rating_category} rating + {emotion_category} emotion → Credibility: {credibility:.0%}")
         
     elif emotion_category == 'neutral':
         # Neutral emotion with any rating - acceptable
         credibility = 0.7 + (confidence * 0.2)  # 0.7 to 0.9
         flag = 'genuine'
         adjustment = 0.0
-        print(f"  ○ NEUTRAL emotion with {rating_category} rating → Credibility: {credibility:.0%}")
         
     elif rating_category == 'neutral':
         # Neutral rating with positive/negative emotion - acceptable
         credibility = 0.75
         flag = 'genuine'
         adjustment = (emotion_score - 3.0) * 0.1  # Slight adjustment based on emotion
-        print(f"  ○ NEUTRAL rating with {emotion_category} emotion → Credibility: {credibility:.0%}")
         
     else:
         # INCONSISTENT: positive ratings + negative emotion OR negative ratings + positive emotion
@@ -535,11 +494,9 @@ def calculate_review_credibility(user_ratings_avg, emotion_result):
         if rating_category == 'positive' and emotion_category == 'negative':
             # User gave high stars but wrote negative text - possibly fake positive review
             adjustment = -0.5 * confidence  # Penalize more for confident negative emotion
-            print(f"  ⚠ SUSPICIOUS: High ratings ({user_ratings_avg:.1f}) but {emotion_label} emotion detected!")
         else:
             # User gave low stars but wrote positive text - unusual but less concerning
             adjustment = 0.3 * confidence  # Slight bonus - they might just be constructive
-            print(f"  ⚠ INCONSISTENT: Low ratings ({user_ratings_avg:.1f}) but {emotion_label} emotion detected")
     
     return {
         'credibility': min(1.0, max(0.0, credibility)),
@@ -1125,19 +1082,6 @@ def submit_review(product_id):
         
         # Check if user already has a review for this product
         existing_review = Review.query.filter_by(product_id=product_id, user_id=current_user.id).first()
-        is_update = existing_review is not None
-        
-        # Log the calculation
-        print(f"\n{'='*60}")
-        print(f"REVIEW SCORING SUMMARY {'(UPDATE)' if is_update else '(NEW)'}")
-        print(f"{'='*60}")
-        print(f"User: {current_user.username}")
-        print(f"User Ratings Average: {user_ratings_avg}/5")
-        print(f"Detected Emotion: {emotion_label.upper()} ({emotion_confidence:.0%} confidence)")
-        print(f"Credibility: {credibility['credibility']:.0%} ({credibility['flag']})")
-        print(f"Adjustment: {'+' if adjustment >= 0 else ''}{adjustment:.2f}")
-        print(f"Final Average: {final_average}/5")
-        print(f"{'='*60}\n")
         
         if existing_review:
             # UPDATE existing review
@@ -1274,6 +1218,79 @@ def consumer_custom_scores():
                           products=products_sorted, 
                           weights=custom_weights,
                           priorities=priorities)
+
+
+# ==========================================
+# PRODUCT COMPARISON DASHBOARD
+# ==========================================
+
+@app.route('/consumer/compare')
+@login_required
+def consumer_compare():
+    """Product comparison dashboard - compare up to 3 products side by side."""
+    if current_user.role != 'consumer':
+        flash('Access denied. Consumer account required.', 'error')
+        return redirect(url_for('producer_dashboard'))
+    
+    # Get product IDs from query params (e.g., /compare?ids=1,2,3)
+    ids_param = request.args.get('ids', '')
+    
+    selected_products = []
+    if ids_param:
+        try:
+            product_ids = [int(id.strip()) for id in ids_param.split(',') if id.strip()][:3]  # Max 3
+            selected_products = Product.query.filter(Product.id.in_(product_ids)).all()
+        except ValueError:
+            pass
+    
+    # Get all products for the selector
+    all_products = Product.query.filter(Product.ideal_score.isnot(None)).order_by(Product.product_name).all()
+    
+    # Calculate comparison data
+    comparison_data = []
+    for product in selected_products:
+        # Get review stats
+        reviews = Review.query.filter_by(product_id=product.id).all()
+        avg_rating = sum(r.rating for r in reviews) / len(reviews) if reviews else 0
+        review_count = len(reviews)
+        
+        # Calculate credibility percentage
+        credible_reviews = [r for r in reviews if r.credibility_flag == 'genuine']
+        credibility_pct = (len(credible_reviews) / len(reviews) * 100) if reviews else 0
+        
+        comparison_data.append({
+            'product': product,
+            'avg_rating': round(avg_rating, 1),
+            'review_count': review_count,
+            'credibility_pct': round(credibility_pct, 0),
+        })
+    
+    return render_template('consumer_compare.html',
+                          comparison_data=comparison_data,
+                          all_products=all_products,
+                          selected_ids=[p.id for p in selected_products])
+
+
+@app.route('/api/products/search')
+@login_required
+def api_product_search():
+    """API endpoint for product search (used by comparison selector)."""
+    query = request.args.get('q', '').strip().lower()
+    
+    if not query or len(query) < 2:
+        return jsonify([])
+    
+    products = Product.query.filter(
+        Product.ideal_score.isnot(None),
+        (Product.product_name.ilike(f'%{query}%') | Product.company_name.ilike(f'%{query}%'))
+    ).limit(10).all()
+    
+    return jsonify([{
+        'id': p.id,
+        'name': p.product_name,
+        'company': p.company_name,
+        'score': p.ideal_score
+    } for p in products])
 
 
 # ==========================================
