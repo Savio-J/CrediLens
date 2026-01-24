@@ -13,6 +13,7 @@ from custom_scoring import calculate_custom_scores_from_db
 from huggingface_hub import InferenceClient
 from dotenv import load_dotenv
 import blockchain  # Blockchain Score Registry
+from seed_data import SEED_PRODUCTS, SEED_USERS  # Seed data for database
 
 # Load environment variables from .env file
 load_dotenv()
@@ -1429,6 +1430,112 @@ def verify_blockchain_score(product_id):
         "explorer_url": explorer_url,
         "timestamp": product.blockchain_timestamp
     })
+
+
+# ==========================================
+# DATABASE SEED ROUTE (for PostgreSQL on Render)
+# ==========================================
+@app.route('/admin/seed-database', methods=['GET', 'POST'])
+def seed_database():
+    """
+    Seed the database with initial products and users.
+    Protected by a secret key to prevent unauthorized access.
+    Visit: /admin/seed-database?key=YOUR_SECRET_KEY
+    """
+    # Use SECRET_KEY or a dedicated SEED_KEY for protection
+    seed_key = os.environ.get('SEED_KEY', 'credilens-seed-2025')
+    provided_key = request.args.get('key', '')
+    
+    if provided_key != seed_key:
+        return jsonify({
+            "error": "Unauthorized. Provide correct ?key= parameter.",
+            "hint": "Set SEED_KEY environment variable on Render"
+        }), 403
+    
+    try:
+        # Check if database already has data
+        existing_products = Product.query.count()
+        existing_users = User.query.count()
+        
+        if existing_products > 0 or existing_users > 0:
+            if request.method != 'POST' and request.args.get('force') != 'true':
+                return jsonify({
+                    "status": "Database already has data",
+                    "products": existing_products,
+                    "users": existing_users,
+                    "action": "Add ?force=true to clear and reseed, or POST to this URL"
+                })
+            
+            # Clear existing data if force=true
+            if request.args.get('force') == 'true':
+                Review.query.delete()
+                Product.query.delete()
+                User.query.delete()
+                db.session.commit()
+        
+        # Seed users
+        users_created = 0
+        for user_data in SEED_USERS:
+            if not User.query.filter_by(username=user_data['username']).first():
+                user = User(
+                    username=user_data['username'],
+                    password=generate_password_hash(user_data['password']),
+                    role=user_data['role'],
+                    company_name=user_data.get('company_name')
+                )
+                db.session.add(user)
+                users_created += 1
+        
+        db.session.commit()
+        
+        # Seed products
+        products_created = 0
+        for p_data in SEED_PRODUCTS:
+            product = Product(
+                company_name=p_data['company_name'],
+                product_name=p_data['product_name'],
+                batch_number=p_data['batch_number'],
+                category=p_data['category'],
+                processor_score=p_data['processor_score'],
+                ram_gb=p_data['ram_gb'],
+                storage_gb=p_data['storage_gb'],
+                battery_mah=p_data['battery_mah'],
+                screen_inches=p_data['screen_inches'],
+                camera_mp=p_data['camera_mp'],
+                price_usd=p_data['price_usd'],
+                weight_g=p_data['weight_g'],
+                ideal_score=p_data['ideal_score'],
+                processor_model=p_data.get('processor_model'),
+                ram_type=p_data.get('ram_type'),
+                storage_type=p_data.get('storage_type'),
+                camera_sensor_main=p_data.get('camera_sensor_main'),
+                camera_sensor_ultra=p_data.get('camera_sensor_ultra'),
+                camera_sensor_telephoto=p_data.get('camera_sensor_telephoto'),
+                battery_tech=p_data.get('battery_tech'),
+                charging_watt=p_data.get('charging_watt'),
+                display_type=p_data.get('display_type'),
+                refresh_rate_hz=p_data.get('refresh_rate_hz'),
+            )
+            db.session.add(product)
+            products_created += 1
+        
+        db.session.commit()
+        
+        return jsonify({
+            "status": "success",
+            "message": "Database seeded successfully!",
+            "products_created": products_created,
+            "users_created": users_created,
+            "total_products": Product.query.count(),
+            "total_users": User.query.count()
+        })
+        
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({
+            "status": "error",
+            "message": str(e)
+        }), 500
 
 
 # ==========================================
