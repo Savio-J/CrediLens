@@ -1,6 +1,18 @@
 # Seed data for CrediLens - 38 iPhone products
 # This file is used to populate the PostgreSQL database on Render
 
+import urllib.parse
+
+def generate_search_links(product_name, company_name):
+    """Generate search URLs for product on major e-commerce sites"""
+    query = urllib.parse.quote_plus(f"{company_name} {product_name}")
+    return {
+        'link_amazon': f"https://www.amazon.com/s?k={query}",
+        'link_flipkart': f"https://www.flipkart.com/search?q={query}",
+        'link_official': f"https://www.apple.com/shop/buy-iphone" if company_name == 'Apple' else None,
+        'link_other': None
+    }
+
 SEED_PRODUCTS = [
     {'company_name': 'Apple', 'product_name': 'iPhone X', 'batch_number': 'IMPORT-2017', 'category': 'Smartphone', 'processor_score': 497740.0, 'ram_gb': 3, 'storage_gb': 64, 'battery_mah': 2716, 'screen_inches': 5.8, 'camera_mp': 12.0, 'price_usd': 999.0, 'weight_g': 174.0, 'ideal_score': 20.28, 'processor_model': 'Apple A-series', 'ram_type': 'LPDDR4X/5X', 'storage_type': 'NVMe SSD', 'camera_sensor_main': 'Sony/Samsung', 'camera_sensor_ultra': 'Samsung ISOCELL', 'camera_sensor_telephoto': None, 'battery_tech': 'Li-Po', 'charging_watt': 20.0, 'display_type': 'OLED/IPS', 'refresh_rate_hz': 60},
     {'company_name': 'Apple', 'product_name': 'iPhone 8', 'batch_number': 'IMPORT-2017', 'category': 'Smartphone', 'processor_score': 497740.0, 'ram_gb': 2, 'storage_gb': 64, 'battery_mah': 1821, 'screen_inches': 4.7, 'camera_mp': 12.0, 'price_usd': 699.0, 'weight_g': 148.0, 'ideal_score': 19.94, 'processor_model': 'Apple A-series', 'ram_type': 'LPDDR4X/5X', 'storage_type': 'NVMe SSD', 'camera_sensor_main': 'Sony/Samsung', 'camera_sensor_ultra': 'Samsung ISOCELL', 'camera_sensor_telephoto': None, 'battery_tech': 'Li-Po', 'charging_watt': 20.0, 'display_type': 'OLED/IPS', 'refresh_rate_hz': 60},

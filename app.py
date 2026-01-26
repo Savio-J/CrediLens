@@ -2,6 +2,9 @@ import os
 import qrcode
 import base64
 import json
+import csv
+import io
+import uuid
 import requests
 from datetime import datetime, timedelta
 from flask import Flask, render_template, request, redirect, url_for, flash, send_file, jsonify, session
@@ -13,7 +16,7 @@ from custom_scoring import calculate_custom_scores_from_db
 from huggingface_hub import InferenceClient
 from dotenv import load_dotenv
 import blockchain  # Blockchain Score Registry
-from seed_data import SEED_PRODUCTS, SEED_USERS  # Seed data for database
+from seed_data import SEED_PRODUCTS, SEED_USERS, generate_search_links  # Seed data for database
 
 # Load environment variables from .env file
 load_dotenv()
@@ -568,6 +571,12 @@ class Product(db.Model):
     blockchain_timestamp = db.Column(db.String(64), nullable=True)
     blockchain_network = db.Column(db.String(32), nullable=True)
     
+    # Redirect Links (where to buy)
+    link_amazon = db.Column(db.String(512), nullable=True)
+    link_flipkart = db.Column(db.String(512), nullable=True)
+    link_official = db.Column(db.String(512), nullable=True)
+    link_other = db.Column(db.String(512), nullable=True)
+    
     # Relationship with reviews
     reviews = db.relationship('Review', backref='product', lazy=True, cascade='all, delete-orphan')
     
@@ -618,6 +627,60 @@ class Review(db.Model):
     
     def __repr__(self):
         return f'<Review {self.id} for Product {self.product_id} by User {self.user_id}>'
+
+
+class PriceHistory(db.Model):
+    """Track price changes over time for each product."""
+    id = db.Column(db.Integer, primary_key=True)
+    product_id = db.Column(db.Integer, db.ForeignKey('product.id'), nullable=False)
+    price_usd = db.Column(db.Float, nullable=False)
+    recorded_at = db.Column(db.DateTime, default=db.func.current_timestamp())
+    
+    # Relationship
+    product = db.relationship('Product', backref=db.backref('price_history', lazy=True, order_by='PriceHistory.recorded_at'))
+    
+    def __repr__(self):
+        return f'<PriceHistory ${self.price_usd} for Product {self.product_id}>'
+
+
+class PriceAlert(db.Model):
+    """User alerts for price drops."""
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    product_id = db.Column(db.Integer, db.ForeignKey('product.id'), nullable=False)
+    target_price = db.Column(db.Float, nullable=False)  # Alert when price drops below this
+    is_active = db.Column(db.Boolean, default=True)
+    created_at = db.Column(db.DateTime, default=db.func.current_timestamp())
+    triggered_at = db.Column(db.DateTime, nullable=True)  # When alert was triggered
+    
+    # Push notification subscription (for PWA)
+    push_subscription = db.Column(db.Text, nullable=True)  # JSON subscription object
+    
+    # Relationships
+    user = db.relationship('User', backref=db.backref('price_alerts', lazy=True))
+    product = db.relationship('Product', backref=db.backref('alerts', lazy=True))
+    
+    # Unique constraint: one alert per user per product
+    __table_args__ = (db.UniqueConstraint('user_id', 'product_id', name='unique_user_product_alert'),)
+    
+    def __repr__(self):
+        return f'<PriceAlert ${self.target_price} for Product {self.product_id} by User {self.user_id}>'
+
+
+class ChatMessage(db.Model):
+    """Store chat history for the AI chatbot."""
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=True)  # Nullable for anonymous users
+    session_id = db.Column(db.String(64), nullable=False)  # For tracking conversation
+    role = db.Column(db.String(16), nullable=False)  # 'user' or 'assistant'
+    content = db.Column(db.Text, nullable=False)
+    timestamp = db.Column(db.DateTime, default=db.func.current_timestamp())
+    
+    # Relationship
+    user = db.relationship('User', backref=db.backref('chat_messages', lazy=True))
+    
+    def __repr__(self):
+        return f'<ChatMessage {self.role}: {self.content[:30]}...>'
 
 
 # Create tables if they don't exist
@@ -827,6 +890,122 @@ def producer_product_detail(product_id):
     reviews = Review.query.filter_by(product_id=product_id).order_by(Review.timestamp.desc()).all()
     return render_template('producer_product_detail.html', product=product, reviews=reviews)
 
+
+@app.route('/producer/product/<int:product_id>/edit-price', methods=['GET', 'POST'])
+@login_required
+def producer_edit_price(product_id):
+    """Allow producers to edit only the price of their products."""
+    if current_user.role != 'producer':
+        flash('Access denied. Producer account required.', 'error')
+        return redirect(url_for('consumer_dashboard'))
+    
+    product = Product.query.get_or_404(product_id)
+    
+    # Check if product belongs to producer's company
+    if product.company_name != current_user.company_name:
+        flash('Access denied. This product does not belong to your company.', 'error')
+        return redirect(url_for('producer_dashboard'))
+    
+    if request.method == 'POST':
+        new_price = _to_float(request.form.get('price_usd'))
+        
+        if new_price is None or new_price <= 0:
+            flash('Please enter a valid price.', 'error')
+            return redirect(url_for('producer_edit_price', product_id=product_id))
+        
+        old_price = product.price_usd
+        
+        # Check if price actually changed
+        if new_price != old_price:
+            product.price_usd = new_price
+            
+            # Recalculate the ideal score with new price
+            product_dict = {
+                'processor_score': product.processor_score,
+                'ram_gb': product.ram_gb,
+                'storage_gb': product.storage_gb,
+                'battery_mah': product.battery_mah,
+                'screen_inches': product.screen_inches,
+                'camera_mp': product.camera_mp,
+                'price_usd': new_price,
+                'weight_g': product.weight_g,
+            }
+            new_score = score_product_from_db(product_dict, db.session)
+            if new_score is not None:
+                product.ideal_score = new_score
+            
+            # Invalidate blockchain verification (price changed = hash mismatch)
+            if product.blockchain_hash:
+                product.blockchain_hash = None
+                product.blockchain_tx = None
+                product.blockchain_timestamp = None
+                product.blockchain_network = None
+                flash(f'Price updated from ${old_price:.2f} to ${new_price:.2f}. Blockchain verification has been reset - please re-verify if needed.', 'warning')
+            else:
+                flash(f'Price updated from ${old_price:.2f} to ${new_price:.2f}. Score recalculated to {new_score:.1f}.', 'success')
+            
+            db.session.commit()
+        else:
+            flash('Price unchanged.', 'info')
+        
+        return redirect(url_for('producer_product_detail', product_id=product_id))
+    
+    return render_template('producer_edit_price.html', product=product)
+
+
+@app.route('/producer/product/<int:product_id>/edit-links', methods=['GET', 'POST'])
+@login_required
+def producer_edit_links(product_id):
+    """Allow producers to edit redirect links for their products."""
+    if current_user.role != 'producer':
+        flash('Access denied. Producer account required.', 'error')
+        return redirect(url_for('consumer_dashboard'))
+    
+    product = Product.query.get_or_404(product_id)
+    
+    # Check if product belongs to producer's company
+    if product.company_name != current_user.company_name:
+        flash('Access denied. This product does not belong to your company.', 'error')
+        return redirect(url_for('producer_dashboard'))
+    
+    if request.method == 'POST':
+        product.link_amazon = request.form.get('link_amazon') or None
+        product.link_flipkart = request.form.get('link_flipkart') or None
+        product.link_official = request.form.get('link_official') or None
+        product.link_other = request.form.get('link_other') or None
+        
+        db.session.commit()
+        flash('Redirect links updated successfully.', 'success')
+        return redirect(url_for('producer_product_detail', product_id=product_id))
+    
+    return render_template('producer_edit_links.html', product=product)
+
+
+@app.route('/producer/product/<int:product_id>/delete', methods=['POST'])
+@login_required
+def producer_delete_product(product_id):
+    """Allow producers to delete their products."""
+    if current_user.role != 'producer':
+        flash('Access denied. Producer account required.', 'error')
+        return redirect(url_for('consumer_dashboard'))
+    
+    product = Product.query.get_or_404(product_id)
+    
+    # Check if product belongs to producer's company
+    if product.company_name != current_user.company_name:
+        flash('Access denied. This product does not belong to your company.', 'error')
+        return redirect(url_for('producer_dashboard'))
+    
+    product_name = product.product_name
+    
+    # Delete the product (reviews cascade delete automatically)
+    db.session.delete(product)
+    db.session.commit()
+    
+    flash(f'Product "{product_name}" has been deleted.', 'success')
+    return redirect(url_for('producer_dashboard'))
+
+
 @app.route('/producer/register', methods=['GET', 'POST'])
 @login_required
 def producer_register():
@@ -861,6 +1040,11 @@ def producer_register():
             charging_watt = _to_float(form.get('charging_watt')),
             display_type = form.get('display_type'),
             refresh_rate_hz = _to_int(form.get('refresh_rate_hz')),
+            # Redirect links
+            link_amazon = form.get('link_amazon') or None,
+            link_flipkart = form.get('link_flipkart') or None,
+            link_official = form.get('link_official') or None,
+            link_other = form.get('link_other') or None,
         )
         db.session.add(p)
         db.session.commit()
@@ -1491,6 +1675,9 @@ def seed_database():
         # Seed products
         products_created = 0
         for p_data in SEED_PRODUCTS:
+            # Generate search links for e-commerce sites
+            links = generate_search_links(p_data['product_name'], p_data['company_name'])
+            
             product = Product(
                 company_name=p_data['company_name'],
                 product_name=p_data['product_name'],
@@ -1515,6 +1702,10 @@ def seed_database():
                 charging_watt=p_data.get('charging_watt'),
                 display_type=p_data.get('display_type'),
                 refresh_rate_hz=p_data.get('refresh_rate_hz'),
+                link_amazon=links['link_amazon'],
+                link_flipkart=links['link_flipkart'],
+                link_official=links['link_official'],
+                link_other=links['link_other'],
             )
             db.session.add(product)
             products_created += 1
@@ -1536,6 +1727,347 @@ def seed_database():
             "status": "error",
             "message": str(e)
         }), 500
+
+
+# ==========================================
+# PRICE TRACKING & ALERTS
+# ==========================================
+
+@app.route('/api/product/<int:product_id>/price-history')
+def get_price_history(product_id):
+    """Get price history for a product (for chart)."""
+    product = Product.query.get_or_404(product_id)
+    history = PriceHistory.query.filter_by(product_id=product_id).order_by(PriceHistory.recorded_at).all()
+    
+    # If no history, return current price as single point
+    if not history:
+        return jsonify({
+            'product_name': product.product_name,
+            'current_price': product.price_usd,
+            'history': [{
+                'price': product.price_usd,
+                'date': datetime.now().isoformat()
+            }]
+        })
+    
+    return jsonify({
+        'product_name': product.product_name,
+        'current_price': product.price_usd,
+        'history': [{'price': h.price_usd, 'date': h.recorded_at.isoformat()} for h in history]
+    })
+
+
+@app.route('/consumer/product/<int:product_id>/set-alert', methods=['POST'])
+@login_required
+def set_price_alert(product_id):
+    """Set a price drop alert for a product."""
+    if current_user.role != 'consumer':
+        flash('Only consumers can set price alerts.', 'error')
+        return redirect(url_for('consumer_product_detail', product_id=product_id))
+    
+    product = Product.query.get_or_404(product_id)
+    target_price = request.form.get('target_price', type=float)
+    
+    if not target_price or target_price <= 0:
+        flash('Please enter a valid target price.', 'error')
+        return redirect(url_for('consumer_product_detail', product_id=product_id))
+    
+    if target_price >= product.price_usd:
+        flash('Target price must be lower than current price.', 'error')
+        return redirect(url_for('consumer_product_detail', product_id=product_id))
+    
+    # Check if alert already exists
+    existing = PriceAlert.query.filter_by(user_id=current_user.id, product_id=product_id).first()
+    
+    if existing:
+        existing.target_price = target_price
+        existing.is_active = True
+        existing.triggered_at = None
+        flash(f'Price alert updated! We\'ll notify you when price drops below ${target_price:.2f}', 'success')
+    else:
+        alert = PriceAlert(
+            user_id=current_user.id,
+            product_id=product_id,
+            target_price=target_price
+        )
+        db.session.add(alert)
+        flash(f'Price alert set! We\'ll notify you when price drops below ${target_price:.2f}', 'success')
+    
+    db.session.commit()
+    return redirect(url_for('consumer_product_detail', product_id=product_id))
+
+
+@app.route('/consumer/my-alerts')
+@login_required
+def my_price_alerts():
+    """View and manage price alerts."""
+    if current_user.role != 'consumer':
+        flash('Only consumers can view price alerts.', 'error')
+        return redirect(url_for('home'))
+    
+    alerts = PriceAlert.query.filter_by(user_id=current_user.id).order_by(PriceAlert.created_at.desc()).all()
+    return render_template('my_alerts.html', alerts=alerts)
+
+
+@app.route('/consumer/alert/<int:alert_id>/delete', methods=['POST'])
+@login_required
+def delete_price_alert(alert_id):
+    """Delete a price alert."""
+    alert = PriceAlert.query.get_or_404(alert_id)
+    
+    if alert.user_id != current_user.id:
+        flash('Unauthorized.', 'error')
+        return redirect(url_for('my_price_alerts'))
+    
+    db.session.delete(alert)
+    db.session.commit()
+    flash('Price alert deleted.', 'success')
+    return redirect(url_for('my_price_alerts'))
+
+
+# ==========================================
+# EXCEL/CSV IMPORT FOR PRODUCTS
+# ==========================================
+
+@app.route('/admin/import-products', methods=['GET', 'POST'])
+def import_products():
+    """Import products from CSV file."""
+    # Simple key-based auth
+    import_key = os.environ.get('IMPORT_KEY', 'credilens-import-2025')
+    provided_key = request.args.get('key', '')
+    
+    if provided_key != import_key:
+        return jsonify({"error": "Unauthorized. Provide correct ?key= parameter."}), 403
+    
+    if request.method == 'GET':
+        return '''
+        <html>
+        <head><title>Import Products - CrediLens</title>
+        <style>body{font-family:Arial;max-width:600px;margin:40px auto;padding:20px}
+        h1{color:#2563eb}form{background:#f3f4f6;padding:20px;border-radius:8px}
+        input[type=file]{margin:10px 0}button{background:#2563eb;color:white;padding:10px 20px;border:none;border-radius:4px;cursor:pointer}</style>
+        </head>
+        <body>
+        <h1>📱 Import Products</h1>
+        <p>Upload a CSV file with product data. <a href="/static/product_import_template.csv">Download template</a></p>
+        <form method="POST" enctype="multipart/form-data">
+        <input type="file" name="file" accept=".csv" required><br>
+        <button type="submit">Import Products</button>
+        </form>
+        </body></html>
+        '''
+    
+    # POST - process the file
+    if 'file' not in request.files:
+        return jsonify({"error": "No file uploaded"}), 400
+    
+    file = request.files['file']
+    if file.filename == '':
+        return jsonify({"error": "No file selected"}), 400
+    
+    try:
+        # Read CSV
+        stream = io.StringIO(file.stream.read().decode("UTF8"), newline=None)
+        reader = csv.DictReader(stream)
+        
+        products_created = 0
+        errors = []
+        
+        for row_num, row in enumerate(reader, start=2):
+            try:
+                # Required fields
+                if not row.get('product_name') or not row.get('company_name'):
+                    errors.append(f"Row {row_num}: Missing product_name or company_name")
+                    continue
+                
+                # Create product
+                product = Product(
+                    product_name=row['product_name'].strip(),
+                    company_name=row['company_name'].strip(),
+                    batch_number=row.get('batch_number', f"IMPORT-{datetime.now().strftime('%Y%m%d')}-{row_num}"),
+                    category=row.get('category', 'Smartphone'),
+                    processor_score=float(row['processor_score']) if row.get('processor_score') else None,
+                    ram_gb=float(row['ram_gb']) if row.get('ram_gb') else None,
+                    storage_gb=float(row['storage_gb']) if row.get('storage_gb') else None,
+                    battery_mah=float(row['battery_mah']) if row.get('battery_mah') else None,
+                    screen_inches=float(row['screen_inches']) if row.get('screen_inches') else None,
+                    camera_mp=float(row['camera_mp']) if row.get('camera_mp') else None,
+                    price_usd=float(row['price_usd']) if row.get('price_usd') else None,
+                    weight_g=float(row['weight_g']) if row.get('weight_g') else None,
+                    processor_model=row.get('processor_model'),
+                    ram_type=row.get('ram_type'),
+                    storage_type=row.get('storage_type'),
+                    camera_sensor_main=row.get('camera_sensor_main'),
+                    camera_sensor_ultra=row.get('camera_sensor_ultra'),
+                    camera_sensor_telephoto=row.get('camera_sensor_telephoto'),
+                    battery_tech=row.get('battery_tech'),
+                    charging_watt=float(row['charging_watt']) if row.get('charging_watt') else None,
+                    display_type=row.get('display_type'),
+                    refresh_rate_hz=float(row['refresh_rate_hz']) if row.get('refresh_rate_hz') else None,
+                    link_amazon=row.get('link_amazon'),
+                    link_flipkart=row.get('link_flipkart'),
+                    link_official=row.get('link_official'),
+                    link_other=row.get('link_other'),
+                )
+                
+                # Calculate score
+                db.session.add(product)
+                db.session.flush()  # Get the ID
+                
+                score = score_product_from_db(product.id)
+                if score:
+                    product.ideal_score = score
+                
+                # Record initial price history
+                price_record = PriceHistory(product_id=product.id, price_usd=product.price_usd)
+                db.session.add(price_record)
+                
+                products_created += 1
+                
+            except Exception as e:
+                errors.append(f"Row {row_num}: {str(e)}")
+        
+        db.session.commit()
+        
+        return jsonify({
+            "status": "success",
+            "products_created": products_created,
+            "errors": errors[:10] if errors else [],
+            "total_errors": len(errors)
+        })
+        
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({"error": str(e)}), 500
+
+
+# ==========================================
+# AI CHATBOT
+# ==========================================
+
+def get_chatbot_context():
+    """Get product database context for the chatbot."""
+    products = Product.query.all()
+    context = "You are CrediBot, the AI assistant for CrediLens - a smartphone credibility platform. "
+    context += "You help users find information about phones, compare products, and understand credibility scores. "
+    context += f"\n\nDatabase has {len(products)} products. Here are some:\n"
+    
+    for p in products[:20]:  # Limit to 20 for context
+        context += f"- {p.product_name} by {p.company_name}: ${p.price_usd}, Score: {p.ideal_score}, "
+        context += f"RAM: {p.ram_gb}GB, Storage: {p.storage_gb}GB, Battery: {p.battery_mah}mAh\n"
+    
+    context += "\nCredibility scores are 0-100 based on specs vs price. Higher is better value."
+    return context
+
+
+@app.route('/chatbot')
+def chatbot_page():
+    """Chatbot interface page."""
+    # Generate session ID for anonymous users
+    if 'chat_session_id' not in session:
+        session['chat_session_id'] = str(uuid.uuid4())
+    
+    return render_template('chatbot.html')
+
+
+@app.route('/api/chat', methods=['POST'])
+def chat_api():
+    """API endpoint for chatbot messages."""
+    data = request.json
+    user_message = data.get('message', '').strip()
+    
+    if not user_message:
+        return jsonify({"error": "Empty message"}), 400
+    
+    session_id = session.get('chat_session_id', str(uuid.uuid4()))
+    
+    # Save user message
+    user_msg = ChatMessage(
+        user_id=current_user.id if current_user.is_authenticated else None,
+        session_id=session_id,
+        role='user',
+        content=user_message
+    )
+    db.session.add(user_msg)
+    
+    try:
+        # Try Google Gemini first (free tier)
+        response_text = call_gemini_chat(user_message)
+        
+        if not response_text:
+            # Fallback to HuggingFace
+            response_text = call_huggingface_chat(user_message)
+        
+        if not response_text:
+            response_text = "I'm sorry, I couldn't process your request right now. Please try again."
+        
+        # Save assistant response
+        assistant_msg = ChatMessage(
+            user_id=current_user.id if current_user.is_authenticated else None,
+            session_id=session_id,
+            role='assistant',
+            content=response_text
+        )
+        db.session.add(assistant_msg)
+        db.session.commit()
+        
+        return jsonify({"response": response_text})
+        
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({"error": str(e)}), 500
+
+
+def call_gemini_chat(user_message):
+    """Call Google Gemini API for chat response."""
+    api_key = os.environ.get("GEMINI_API_KEY")
+    if not api_key:
+        return None
+    
+    context = get_chatbot_context()
+    
+    body = {
+        "contents": [{
+            "parts": [{"text": f"{context}\n\nUser: {user_message}\n\nAssistant:"}]
+        }],
+        "generationConfig": {
+            "temperature": 0.7,
+            "maxOutputTokens": 500,
+        }
+    }
+    
+    url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key={api_key}"
+    
+    try:
+        response = requests.post(url, json=body, timeout=15)
+        if response.status_code == 200:
+            result = response.json()
+            if "candidates" in result and len(result["candidates"]) > 0:
+                return result["candidates"][0]["content"]["parts"][0]["text"]
+    except:
+        pass
+    
+    return None
+
+
+def call_huggingface_chat(user_message):
+    """Fallback to HuggingFace Inference API."""
+    api_key = os.environ.get("HF_TOKEN") or os.environ.get("HUGGINGFACE_TOKEN")
+    if not api_key:
+        return None
+    
+    try:
+        client = InferenceClient(token=api_key)
+        context = get_chatbot_context()
+        
+        response = client.text_generation(
+            f"{context}\n\nUser: {user_message}\n\nAssistant:",
+            model="mistralai/Mistral-7B-Instruct-v0.3",
+            max_new_tokens=300
+        )
+        return response
+    except:
+        return None
 
 
 # ==========================================

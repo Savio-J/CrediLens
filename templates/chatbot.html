@@ -1,0 +1,182 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="max-w-4xl mx-auto px-4 py-6">
+    <!-- Header -->
+    <div class="text-center mb-6">
+        <h1 class="text-3xl font-bold text-gray-900 flex items-center justify-center">
+            <span class="text-4xl mr-3">🤖</span>
+            CrediBot
+        </h1>
+        <p class="text-gray-600 mt-2">Your AI assistant for smartphone questions</p>
+    </div>
+
+    <!-- Chat Container -->
+    <div class="glass-panel overflow-hidden">
+        <!-- Messages Area -->
+        <div id="chatMessages" class="h-96 overflow-y-auto p-4 space-y-4 bg-gray-50">
+            <!-- Welcome Message -->
+            <div class="flex items-start">
+                <div class="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center text-white text-sm font-bold mr-3 flex-shrink-0">
+                    🤖
+                </div>
+                <div class="bg-white rounded-lg p-3 shadow-sm max-w-[80%]">
+                    <p class="text-gray-800">Hi! I'm CrediBot, your smartphone expert. I can help you with:</p>
+                    <ul class="text-gray-600 text-sm mt-2 space-y-1">
+                        <li>📱 Finding phones with specific specs</li>
+                        <li>💰 Budget recommendations</li>
+                        <li>📊 Understanding credibility scores</li>
+                        <li>🔄 Comparing different models</li>
+                    </ul>
+                    <p class="text-gray-800 mt-2">What would you like to know?</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Input Area -->
+        <div class="p-4 bg-white border-t border-gray-200">
+            <form id="chatForm" class="flex gap-3">
+                <input 
+                    type="text" 
+                    id="userInput" 
+                    placeholder="Ask me about phones..." 
+                    class="flex-1 rounded-lg border border-gray-300 px-4 py-3 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    autocomplete="off"
+                >
+                <button 
+                    type="submit" 
+                    id="sendBtn"
+                    class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-medium transition flex items-center"
+                >
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/>
+                    </svg>
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Quick Questions -->
+    <div class="mt-6">
+        <p class="text-sm text-gray-500 mb-3">Quick questions:</p>
+        <div class="flex flex-wrap gap-2">
+            <button onclick="askQuestion('What is the best phone under $500?')" class="px-3 py-1.5 bg-gray-100 hover:bg-gray-200 rounded-full text-sm text-gray-700 transition">
+                Best phone under $500?
+            </button>
+            <button onclick="askQuestion('Which phone has the best camera?')" class="px-3 py-1.5 bg-gray-100 hover:bg-gray-200 rounded-full text-sm text-gray-700 transition">
+                Best camera phone?
+            </button>
+            <button onclick="askQuestion('How is the credibility score calculated?')" class="px-3 py-1.5 bg-gray-100 hover:bg-gray-200 rounded-full text-sm text-gray-700 transition">
+                How is score calculated?
+            </button>
+            <button onclick="askQuestion('Compare iPhone 16 Pro and Samsung S24 Ultra')" class="px-3 py-1.5 bg-gray-100 hover:bg-gray-200 rounded-full text-sm text-gray-700 transition">
+                iPhone vs Samsung
+            </button>
+        </div>
+    </div>
+</div>
+
+<script>
+const chatMessages = document.getElementById('chatMessages');
+const chatForm = document.getElementById('chatForm');
+const userInput = document.getElementById('userInput');
+const sendBtn = document.getElementById('sendBtn');
+
+function addMessage(content, isUser) {
+    const messageDiv = document.createElement('div');
+    messageDiv.className = 'flex items-start ' + (isUser ? 'justify-end' : '');
+    
+    if (isUser) {
+        messageDiv.innerHTML = `
+            <div class="bg-blue-600 text-white rounded-lg p-3 max-w-[80%]">
+                <p>${escapeHtml(content)}</p>
+            </div>
+        `;
+    } else {
+        messageDiv.innerHTML = `
+            <div class="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center text-white text-sm font-bold mr-3 flex-shrink-0">
+                🤖
+            </div>
+            <div class="bg-white rounded-lg p-3 shadow-sm max-w-[80%]">
+                <p class="text-gray-800 whitespace-pre-wrap">${escapeHtml(content)}</p>
+            </div>
+        `;
+    }
+    
+    chatMessages.appendChild(messageDiv);
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+}
+
+function addTypingIndicator() {
+    const typingDiv = document.createElement('div');
+    typingDiv.id = 'typingIndicator';
+    typingDiv.className = 'flex items-start';
+    typingDiv.innerHTML = `
+        <div class="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center text-white text-sm font-bold mr-3 flex-shrink-0">
+            🤖
+        </div>
+        <div class="bg-white rounded-lg p-3 shadow-sm">
+            <div class="flex space-x-1">
+                <div class="w-2 h-2 bg-gray-400 rounded-full animate-bounce"></div>
+                <div class="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style="animation-delay: 0.1s"></div>
+                <div class="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style="animation-delay: 0.2s"></div>
+            </div>
+        </div>
+    `;
+    chatMessages.appendChild(typingDiv);
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+}
+
+function removeTypingIndicator() {
+    const typing = document.getElementById('typingIndicator');
+    if (typing) typing.remove();
+}
+
+function escapeHtml(text) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+}
+
+async function sendMessage(message) {
+    if (!message.trim()) return;
+    
+    addMessage(message, true);
+    userInput.value = '';
+    sendBtn.disabled = true;
+    addTypingIndicator();
+    
+    try {
+        const response = await fetch('/api/chat', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({message: message})
+        });
+        
+        const data = await response.json();
+        removeTypingIndicator();
+        
+        if (data.response) {
+            addMessage(data.response, false);
+        } else if (data.error) {
+            addMessage('Sorry, something went wrong. Please try again.', false);
+        }
+    } catch (error) {
+        removeTypingIndicator();
+        addMessage('Sorry, I couldn\'t connect. Please check your internet connection.', false);
+    }
+    
+    sendBtn.disabled = false;
+    userInput.focus();
+}
+
+function askQuestion(question) {
+    userInput.value = question;
+    sendMessage(question);
+}
+
+chatForm.addEventListener('submit', (e) => {
+    e.preventDefault();
+    sendMessage(userInput.value);
+});
+</script>
+{% endblock %}
