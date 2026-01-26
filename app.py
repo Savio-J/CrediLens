@@ -1952,7 +1952,7 @@ def get_chatbot_context():
     context += "You help users find information about phones, compare products, and understand credibility scores. "
     context += f"\n\nDatabase has {len(products)} products. Here are some:\n"
     
-    for p in products[:20]:  # Limit to 20 for context
+    for p in products[:50]:  # Limit to 20 for context
         context += f"- {p.product_name} by {p.company_name}: ${p.price_usd}, Score: {p.ideal_score}, "
         context += f"RAM: {p.ram_gb}GB, Storage: {p.storage_gb}GB, Battery: {p.battery_mah}mAh\n"
     
