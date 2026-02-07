@@ -1,39 +1,42 @@
 {% extends "base.html" %}
 {% block content %}
+<!-- Consumer Secondary Navbar -->
+<div class="bg-white border-b border-gray-200 -mt-6 mb-6 -mx-4 px-4 sm:-mx-6 sm:px-6 lg:-mx-8 lg:px-8">
+    <div class="max-w-6xl mx-auto">
+        <div class="flex items-center justify-between py-3">
+            <div class="flex items-center space-x-1 overflow-x-auto">
+                <a href="/consumer" class="px-4 py-2 text-sm font-medium text-blue-600 bg-blue-50 rounded-lg whitespace-nowrap">
+                    📱 Products
+                </a>
+                <a href="/consumer/compare" class="px-4 py-2 text-sm font-medium text-gray-600 hover:text-blue-600 hover:bg-gray-50 rounded-lg transition whitespace-nowrap">
+                    📊 Compare
+                </a>
+                <a href="/consumer/custom-scores" class="px-4 py-2 text-sm font-medium text-gray-600 hover:text-blue-600 hover:bg-gray-50 rounded-lg transition whitespace-nowrap">
+                    ⚙️ Custom Score
+                </a>
+                <a href="/chatbot" class="px-4 py-2 text-sm font-medium text-gray-600 hover:text-blue-600 hover:bg-gray-50 rounded-lg transition whitespace-nowrap">
+                    🤖 AI Chat
+                </a>
+                <a href="/consumer/ai-scan" class="px-4 py-2 text-sm font-medium text-gray-600 hover:text-blue-600 hover:bg-gray-50 rounded-lg transition whitespace-nowrap">
+                    📷 AI Scan
+                </a>
+                <a href="/consumer/scan" class="px-4 py-2 text-sm font-medium text-gray-600 hover:text-blue-600 hover:bg-gray-50 rounded-lg transition whitespace-nowrap">
+                    📲 QR Scan
+                </a>
+                <a href="/consumer/my-alerts" class="px-4 py-2 text-sm font-medium text-gray-600 hover:text-blue-600 hover:bg-gray-50 rounded-lg transition whitespace-nowrap">
+                    🔔 Alerts
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
 <div class="max-w-6xl mx-auto">
-    <!-- Header with Action Buttons -->
+    <!-- Header -->
     <div class="mb-6">
-        <div class="flex justify-between items-center mb-4">
-            <div>
-                <h2 class="text-3xl font-bold text-gray-900">Consumer Portal</h2>
-                <p class="text-gray-500">Find out how good that phone <i>really</i> is.</p>
-            </div>
-            <div class="flex gap-3 flex-wrap">
-                <a href="/chatbot" class="bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 text-white px-4 py-2 rounded-lg font-medium transition flex items-center">
-                    <span class="mr-2">🤖</span>
-                    AI Chat
-                </a>
-                <a href="/consumer/my-alerts" class="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg font-medium transition flex items-center">
-                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path></svg>
-                    Alerts
-                </a>
-                <a href="/consumer/compare" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg font-medium transition flex items-center">
-                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
-                    Compare
-                </a>
-                <a href="/consumer/custom-scores" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium transition flex items-center">
-                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"></path></svg>
-                    Custom Score
-                </a>
-                <a href="/consumer/ai-scan" class="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white px-4 py-2 rounded-lg font-medium transition flex items-center">
-                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
-                    AI Scan
-                </a>
-                <a href="/consumer/scan" class="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded-lg font-medium transition flex items-center">
-                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z"></path></svg>
-                    QR Scan
-                </a>
-            </div>
+        <div class="mb-4">
+            <h2 class="text-3xl font-bold text-gray-900">Consumer Portal</h2>
+            <p class="text-gray-500">Find out how good that phone <i>really</i> is.</p>
         </div>
         
         <!-- Search Bar -->
@@ -66,6 +69,14 @@
                     <span class="inline-flex items-center mt-2 px-3 py-1 bg-green-100 text-green-700 text-sm font-semibold rounded-full">
                         <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path></svg>
                         Verified
+                    </span>
+                    {% endif %}
+                    
+                    <!-- Verified Seller Badge -->
+                    {% if product.verification_status == 'approved' %}
+                    <span class="inline-flex items-center mt-2 {% if product.blockchain_tx %}ml-2{% endif %} px-3 py-1 bg-purple-100 text-purple-700 text-sm font-semibold rounded-full">
+                        <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                        Verified Seller
                     </span>
                     {% endif %}
                     

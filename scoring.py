@@ -12,15 +12,18 @@ class CredibilityScorer:
     
     def __init__(self):
         # Scoring configuration with weights (importance)
+        # Higher weights = more importance in final score
         self.score_cols_with_weights = {
-            "processor_score": 8,
-            "ram_gb": 7,
-            "storage_gb": 6,
-            "battery_mah": 5,
-            "screen_inches": 4,
-            "camera_mp": 4,
-            "price_usd": 3,
-            "weight_g": 2,
+            "processor_score": 10,    # Most important - raw performance
+            "ram_gb": 7,              # Important for multitasking
+            "storage_gb": 5,          # Storage capacity
+            "battery_mah": 6,         # Battery life matters
+            "refresh_rate_hz": 5,     # Display smoothness (newer phones have 120Hz+)
+            "charging_watt": 4,       # Fast charging capability
+            "screen_inches": 2,       # Screen size (less important)
+            "camera_mp": 3,           # Megapixels (not everything, but indicator)
+            "price_usd": 1,           # Low weight - cheap doesn't mean good
+            "weight_g": 1,            # Physical weight (minor factor)
         }
         
         # Lower is better for these columns

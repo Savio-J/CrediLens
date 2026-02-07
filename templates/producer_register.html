@@ -9,7 +9,7 @@
         <h2 class="text-2xl font-bold text-gray-900 mb-2 border-b pb-4">Register Product</h2>
         <p class="text-gray-500 mb-6">Registering for: <span class="font-semibold text-blue-600">{{ current_user.company_name }}</span></p>
         
-        <form action="/producer/register" method="post">
+        <form action="/producer/register" method="post" enctype="multipart/form-data">
             <!-- Basic Info -->
             <div class="mb-8">
                 <h4 class="text-sm uppercase tracking-wide text-gray-500 font-bold mb-4">Basic Information</h4>
@@ -182,7 +182,38 @@
                 </div>
             </div>
 
-            <div class="flex justify-end">
+            <!-- Seller Verification Section -->
+            <div class="glass-panel p-6 mt-6 border-2 border-purple-200 bg-purple-50">
+                <h3 class="text-lg font-semibold text-gray-800 mb-4 flex items-center">
+                    <svg class="w-5 h-5 mr-2 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
+                    </svg>
+                    Seller Verification (Required)
+                </h3>
+                <div class="bg-white rounded-lg p-4 mb-4">
+                    <p class="text-sm text-gray-600 mb-3">
+                        <strong>Upload your Authorized Dealer/Reseller Certificate</strong> from the manufacturer 
+                        (Apple, Samsung, etc.) to verify your products are authentic.
+                    </p>
+                    <ul class="text-xs text-gray-500 space-y-1 mb-4">
+                        <li>✓ Document should have brand/manufacturer logo</li>
+                        <li>✓ Should contain words like "Authorized Dealer" or "Official Reseller"</li>
+                        <li>✓ Must show your company name: <strong>{{ current_user.company_name }}</strong></li>
+                        <li>✓ Should have validity dates and official signature/stamp</li>
+                    </ul>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Upload Certificate (PDF, JPG, PNG)</label>
+                        <input type="file" name="verification_doc" accept=".pdf,.jpg,.jpeg,.png" 
+                               class="w-full p-2 border border-gray-300 rounded-lg text-sm file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:bg-purple-100 file:text-purple-700 hover:file:bg-purple-200" required>
+                    </div>
+                </div>
+                <p class="text-xs text-gray-500">
+                    📌 Your document will be screened by AI first. If it passes, a verifier will review and approve it.
+                    Products won't show "Verified Seller" badge until approved.
+                </p>
+            </div>
+
+            <div class="flex justify-end mt-6">
                 <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-8 rounded-lg shadow-lg transform transition hover:scale-105">
                     Register & Generate QR
                 </button>

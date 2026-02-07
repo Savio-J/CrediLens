@@ -5,6 +5,10 @@ import json
 import csv
 import io
 import uuid
+import smtplib
+import threading
+from email.mime.text import MIMEText
+from email.mime.multipart import MIMEMultipart
 import requests
 from datetime import datetime, timedelta
 from flask import Flask, render_template, request, redirect, url_for, flash, send_file, jsonify, session
@@ -242,6 +246,151 @@ If no phone is visible, set "identified" to false."""
     return {"error": f"All Gemini models failed. Last error: {last_error}. Please check your API key at https://aistudio.google.com/app/apikey", "phone": None}
 
 
+def screen_verification_document(image_base64, company_name, mime_type="image/jpeg"):
+    """
+    Use Google Gemini to screen an uploaded verification document.
+    Checks if it appears to be a legitimate authorized dealer certificate.
+    
+    Returns:
+        {
+            "passed": True/False,
+            "score": 0-6 (number of checks passed),
+            "checks": {
+                "has_letterhead": True/False,
+                "has_authorization_text": True/False,
+                "has_company_name": True/False,
+                "has_validity_dates": True/False,
+                "has_signature_stamp": True/False,
+                "looks_professional": True/False
+            },
+            "extracted_info": {
+                "issuing_brand": "...",
+                "company_mentioned": "...",
+                "valid_until": "..."
+            },
+            "reason": "explanation"
+        }
+    """
+    api_key = os.environ.get("GEMINI_API_KEY")
+    if not api_key:
+        return {"passed": False, "score": 0, "reason": "GEMINI_API_KEY not configured"}
+    
+    prompt = f"""Analyze this document image and determine if it appears to be a legitimate Authorized Dealer/Reseller Certificate.
+
+The document is being submitted by a company named: "{company_name}"
+
+Check for the following elements and respond with a JSON object:
+
+1. has_letterhead: Does it have a company/brand logo or letterhead?
+2. has_authorization_text: Does it contain words like "Authorized", "Dealer", "Reseller", "Distributor", "Certificate", "Official Partner"?
+3. has_company_name: Does the document mention the company name "{company_name}" or something similar?
+4. has_validity_dates: Does it show validity dates or issue date?
+5. has_signature_stamp: Does it have an official signature, stamp, or seal?
+6. looks_professional: Does the document look professionally made (not handwritten, not obviously edited)?
+
+IMPORTANT: Respond ONLY with a JSON object in this exact format:
+{{
+    "checks": {{
+        "has_letterhead": true/false,
+        "has_authorization_text": true/false,
+        "has_company_name": true/false,
+        "has_validity_dates": true/false,
+        "has_signature_stamp": true/false,
+        "looks_professional": true/false
+    }},
+    "extracted_info": {{
+        "issuing_brand": "the brand name issuing the certificate (Apple, Samsung, etc.) or null",
+        "company_mentioned": "the company name found in the document or null",
+        "valid_until": "expiry date if found or null"
+    }},
+    "overall_assessment": "brief explanation of your analysis"
+}}"""
+
+    body = {
+        "contents": [{
+            "parts": [
+                {"text": prompt},
+                {
+                    "inline_data": {
+                        "mime_type": mime_type,
+                        "data": image_base64
+                    }
+                }
+            ]
+        }],
+        "generationConfig": {
+            "temperature": 0.1,
+            "topK": 1,
+            "topP": 1,
+            "maxOutputTokens": 2048,
+        }
+    }
+    
+    models_to_try = ["gemini-2.0-flash", "gemini-2.5-flash", "gemini-pro-vision"]
+    last_error = None
+    
+    for model_name in models_to_try:
+        url = f"https://generativelanguage.googleapis.com/v1beta/models/{model_name}:generateContent?key={api_key}"
+        
+        try:
+            response = requests.post(url, json=body, timeout=60)
+            
+            if response.status_code == 404:
+                last_error = f"Model {model_name} not available"
+                continue
+            
+            if response.status_code == 429:
+                last_error = "Rate limited"
+                continue
+                
+            response.raise_for_status()
+            data = response.json()
+            
+            if 'candidates' in data and data['candidates']:
+                text = data['candidates'][0].get('content', {}).get('parts', [{}])[0].get('text', '')
+                
+                # Clean and parse JSON
+                text = text.strip()
+                if text.startswith('```json'):
+                    text = text[7:]
+                if text.startswith('```'):
+                    text = text[3:]
+                if text.endswith('```'):
+                    text = text[:-3]
+                text = text.strip()
+                
+                try:
+                    result = json.loads(text)
+                    checks = result.get('checks', {})
+                    
+                    # Count passed checks
+                    score = sum(1 for v in checks.values() if v is True)
+                    passed = score >= 4  # Pass if 4+ out of 6 checks pass
+                    
+                    return {
+                        "passed": passed,
+                        "score": score,
+                        "checks": checks,
+                        "extracted_info": result.get('extracted_info', {}),
+                        "reason": result.get('overall_assessment', 'Analysis complete')
+                    }
+                except json.JSONDecodeError:
+                    return {
+                        "passed": False,
+                        "score": 0,
+                        "reason": f"Could not parse AI response: {text[:200]}"
+                    }
+        
+        except requests.exceptions.RequestException as e:
+            last_error = str(e)
+            continue
+        except Exception as e:
+            last_error = str(e)
+            continue
+    
+    return {"passed": False, "score": 0, "reason": f"AI screening failed: {last_error}"}
+
+
 def match_phone_in_database(brand, model):
     """
     Match the identified phone with products in the database.
@@ -350,6 +499,7 @@ class User(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(80), unique=True, nullable=False)
     password = db.Column(db.String(256), nullable=False)
+    email = db.Column(db.String(120), nullable=True)  # For notifications
     role = db.Column(db.String(20), nullable=False)  # 'consumer' or 'producer'
     company_name = db.Column(db.String(128), nullable=True)  # For producers: 'Apple', 'Samsung', etc.
     
@@ -577,6 +727,15 @@ class Product(db.Model):
     link_official = db.Column(db.String(512), nullable=True)
     link_other = db.Column(db.String(512), nullable=True)
     
+    # Document Verification
+    verification_doc = db.Column(db.Text, nullable=True)  # Base64 encoded document
+    verification_doc_type = db.Column(db.String(10), nullable=True)  # pdf, jpg, png
+    verification_status = db.Column(db.String(20), default='not_submitted')  # not_submitted, pending_ml, pending_review, approved, rejected
+    verification_notes = db.Column(db.Text, nullable=True)  # Verifier's comments
+    verified_by = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=True)
+    verified_at = db.Column(db.DateTime, nullable=True)
+    ml_screening_result = db.Column(db.Text, nullable=True)  # Gemini's analysis
+    
     # Relationship with reviews
     reviews = db.relationship('Review', backref='product', lazy=True, cascade='all, delete-orphan')
     
@@ -698,6 +857,165 @@ with app.app_context():
 # Use `render_template('<name>.html')` in the route handlers below.
 
 # ==========================================
+# EMAIL CONFIGURATION
+# ==========================================
+# Set these environment variables:
+# - EMAIL_SENDER: The email address to send from (e.g., credilens.alerts@gmail.com)
+# - EMAIL_PASSWORD: App password for the email (NOT your regular password!)
+# - EMAIL_SMTP_SERVER: SMTP server (default: smtp.gmail.com)
+# - EMAIL_SMTP_PORT: SMTP port (default: 587)
+
+def send_alert_email(recipient_email, product_name, old_price, new_price, target_price, product_url):
+    """Send price drop alert email to user."""
+    sender_email = os.environ.get('EMAIL_SENDER')
+    sender_password = os.environ.get('EMAIL_PASSWORD')
+    smtp_server = os.environ.get('EMAIL_SMTP_SERVER', 'smtp.gmail.com')
+    smtp_port = int(os.environ.get('EMAIL_SMTP_PORT', 587))
+    
+    if not sender_email or not sender_password:
+        print(f"[Alert Email] Email not configured. Would send to {recipient_email}")
+        return False
+    
+    try:
+        # Create message
+        msg = MIMEMultipart('alternative')
+        msg['Subject'] = f'🔔 Price Drop Alert: {product_name} is now ${new_price:.2f}!'
+        msg['From'] = sender_email
+        msg['To'] = recipient_email
+        
+        # Plain text version
+        text = f"""
+Price Drop Alert from CrediLens!
+
+Great news! The price of {product_name} has dropped!
+
+Previous Price: ${old_price:.2f}
+New Price: ${new_price:.2f}
+Your Target: ${target_price:.2f}
+You Save: ${old_price - new_price:.2f}
+
+View the product: {product_url}
+
+---
+This alert was triggered because the price dropped below your target of ${target_price:.2f}.
+To manage your alerts, visit CrediLens and go to "My Alerts".
+        """
+        
+        # HTML version
+        html = f"""
+        <html>
+        <body style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+            <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 30px; text-align: center; border-radius: 10px 10px 0 0;">
+                <h1 style="color: white; margin: 0;">🔔 Price Drop Alert!</h1>
+            </div>
+            <div style="background: #f8f9fa; padding: 30px; border-radius: 0 0 10px 10px;">
+                <h2 style="color: #333; margin-top: 0;">{product_name}</h2>
+                
+                <div style="background: white; padding: 20px; border-radius: 8px; margin: 20px 0;">
+                    <table style="width: 100%;">
+                        <tr>
+                            <td style="color: #666;">Previous Price:</td>
+                            <td style="text-align: right; text-decoration: line-through; color: #999;">${old_price:.2f}</td>
+                        </tr>
+                        <tr>
+                            <td style="color: #666;">New Price:</td>
+                            <td style="text-align: right; font-size: 24px; font-weight: bold; color: #22c55e;">${new_price:.2f}</td>
+                        </tr>
+                        <tr>
+                            <td style="color: #666;">Your Target:</td>
+                            <td style="text-align: right; color: #8b5cf6;">${target_price:.2f}</td>
+                        </tr>
+                        <tr>
+                            <td style="color: #666;">You Save:</td>
+                            <td style="text-align: right; color: #22c55e; font-weight: bold;">${old_price - new_price:.2f}</td>
+                        </tr>
+                    </table>
+                </div>
+                
+                <a href="{product_url}" style="display: block; background: #8b5cf6; color: white; text-decoration: none; padding: 15px 30px; border-radius: 8px; text-align: center; font-weight: bold;">
+                    View Product Now →
+                </a>
+                
+                <p style="color: #999; font-size: 12px; margin-top: 30px; text-align: center;">
+                    This alert was triggered because the price dropped below your target of ${target_price:.2f}.<br>
+                    <a href="#" style="color: #8b5cf6;">Manage your alerts</a> on CrediLens.
+                </p>
+            </div>
+        </body>
+        </html>
+        """
+        
+        msg.attach(MIMEText(text, 'plain'))
+        msg.attach(MIMEText(html, 'html'))
+        
+        # Send email
+        with smtplib.SMTP(smtp_server, smtp_port) as server:
+            server.starttls()
+            server.login(sender_email, sender_password)
+            server.sendmail(sender_email, recipient_email, msg.as_string())
+        
+        print(f"[Alert Email] Sent to {recipient_email} for {product_name}")
+        return True
+        
+    except Exception as e:
+        print(f"[Alert Email] Failed to send to {recipient_email}: {str(e)}")
+        return False
+
+
+def send_alert_email_async(recipient_email, product_name, old_price, new_price, target_price, product_url):
+    """Send email in background thread to not block the request."""
+    thread = threading.Thread(
+        target=send_alert_email,
+        args=(recipient_email, product_name, old_price, new_price, target_price, product_url)
+    )
+    thread.daemon = True
+    thread.start()
+
+
+def check_and_trigger_alerts(product_id, new_price):
+    """Check all active alerts for this product and trigger if price dropped below target."""
+    # Get all active alerts for this product where target is >= new price
+    alerts = PriceAlert.query.filter(
+        PriceAlert.product_id == product_id,
+        PriceAlert.is_active == True,
+        PriceAlert.target_price >= new_price
+    ).all()
+    
+    if not alerts:
+        return 0
+    
+    product = Product.query.get(product_id)
+    triggered_count = 0
+    
+    for alert in alerts:
+        user = User.query.get(alert.user_id)
+        if not user:
+            continue
+        
+        # Mark alert as triggered
+        alert.is_active = False
+        alert.triggered_at = datetime.now()
+        
+        # Send email if user has email
+        if user.email:
+            product_url = f"https://credilens.onrender.com/consumer/product/{product_id}"
+            send_alert_email_async(
+                user.email,
+                product.product_name,
+                alert.target_price + (alert.target_price * 0.1),  # Estimate old price
+                new_price,
+                alert.target_price,
+                product_url
+            )
+        
+        triggered_count += 1
+    
+    db.session.commit()
+    print(f"[Price Alerts] Triggered {triggered_count} alerts for product {product_id}")
+    return triggered_count
+
+
+# ==========================================
 # 3. ROUTES
 # ==========================================
 
@@ -710,13 +1028,15 @@ def login():
     if current_user.is_authenticated:
         if current_user.role == 'producer':
             return redirect(url_for('producer_dashboard'))
+        elif current_user.role == 'verifier':
+            return redirect(url_for('verifier_dashboard'))
         else:
             return redirect(url_for('consumer_dashboard'))
     
     if request.method == 'POST':
         username = request.form.get('username', '').strip()
         password = request.form.get('password', '')
-        user_type = request.form.get('user_type', 'consumer')  # 'consumer' or 'producer'
+        user_type = request.form.get('user_type', 'consumer')  # 'consumer', 'producer', or 'verifier'
         remember_me = request.form.get('remember_me') == 'on'  # Checkbox value
         
         user = User.query.filter_by(username=username).first()
@@ -734,6 +1054,8 @@ def login():
                 flash(f'Welcome back, {username}!', 'success')
                 if user.role == 'producer':
                     return redirect(url_for('producer_dashboard'))
+                elif user.role == 'verifier':
+                    return redirect(url_for('verifier_dashboard'))
                 else:
                     return redirect(url_for('consumer_dashboard'))
             else:
@@ -807,22 +1129,45 @@ def logout():
 @login_required
 def profile():
     if request.method == 'POST':
-        new_password = request.form.get('new_password', '').strip()
-        confirm_password = request.form.get('confirm_password', '').strip()
+        action = request.form.get('action', 'password')
         
-        if new_password:
-            if len(new_password) < 5:
-                flash('Password must be at least 5 characters.', 'error')
-            elif new_password != confirm_password:
-                flash('Passwords do not match.', 'error')
+        if action == 'email':
+            new_email = request.form.get('email', '').strip()
+            if new_email:
+                # Basic email validation
+                if '@' not in new_email or '.' not in new_email:
+                    flash('Please enter a valid email address.', 'error')
+                else:
+                    current_user.email = new_email
+                    db.session.commit()
+                    flash('Email updated successfully! You will now receive price drop alerts.', 'success')
             else:
-                current_user.password = generate_password_hash(new_password)
+                current_user.email = None
                 db.session.commit()
-                flash('Password updated successfully!', 'success')
+                flash('Email removed. You will no longer receive email alerts.', 'info')
+        else:
+            new_password = request.form.get('new_password', '').strip()
+            confirm_password = request.form.get('confirm_password', '').strip()
+            
+            if new_password:
+                if len(new_password) < 5:
+                    flash('Password must be at least 5 characters.', 'error')
+                elif new_password != confirm_password:
+                    flash('Passwords do not match.', 'error')
+                else:
+                    current_user.password = generate_password_hash(new_password)
+                    db.session.commit()
+                    flash('Password updated successfully!', 'success')
         
         return redirect(url_for('profile'))
     
-    return render_template('profile.html')
+    # Get triggered alerts count for notification badge
+    triggered_alerts = PriceAlert.query.filter_by(
+        user_id=current_user.id,
+        is_active=False
+    ).filter(PriceAlert.triggered_at != None).count()
+    
+    return render_template('profile.html', triggered_alerts=triggered_alerts)
 
 
 @app.route('/')
@@ -919,6 +1264,10 @@ def producer_edit_price(product_id):
         if new_price != old_price:
             product.price_usd = new_price
             
+            # Record price history
+            price_record = PriceHistory(product_id=product_id, price_usd=new_price)
+            db.session.add(price_record)
+            
             # Recalculate the ideal score with new price
             product_dict = {
                 'processor_score': product.processor_score,
@@ -945,6 +1294,8 @@ def producer_edit_price(product_id):
                 flash(f'Price updated from ${old_price:.2f} to ${new_price:.2f}. Score recalculated to {new_score:.1f}.', 'success')
             
             db.session.commit()
+            # Check and trigger price alerts
+            check_and_trigger_alerts(product_id, new_price)
         else:
             flash('Price unchanged.', 'info')
         
@@ -1006,6 +1357,212 @@ def producer_delete_product(product_id):
     return redirect(url_for('producer_dashboard'))
 
 
+@app.route('/producer/product/<int:product_id>/upload-verification', methods=['GET', 'POST'])
+@login_required
+def producer_upload_verification(product_id):
+    """Allow producers to upload verification documents for their products."""
+    if current_user.role != 'producer':
+        flash('Access denied. Producer account required.', 'error')
+        return redirect(url_for('consumer_dashboard'))
+    
+    product = Product.query.get_or_404(product_id)
+    
+    # Check if product belongs to producer's company
+    if product.company_name != current_user.company_name:
+        flash('Access denied. This product does not belong to your company.', 'error')
+        return redirect(url_for('producer_dashboard'))
+    
+    if request.method == 'POST':
+        if 'document' not in request.files:
+            flash('No document uploaded.', 'error')
+            return redirect(request.url)
+        
+        file = request.files['document']
+        
+        if file.filename == '':
+            flash('No document selected.', 'error')
+            return redirect(request.url)
+        
+        # Check file type
+        allowed_extensions = {'pdf', 'jpg', 'jpeg', 'png'}
+        file_ext = file.filename.rsplit('.', 1)[1].lower() if '.' in file.filename else ''
+        
+        if file_ext not in allowed_extensions:
+            flash('Invalid file type. Please upload PDF, JPG, or PNG.', 'error')
+            return redirect(request.url)
+        
+        # Read and encode file to base64
+        import base64
+        file_content = file.read()
+        file_base64 = base64.b64encode(file_content).decode('utf-8')
+        
+        # Determine mime type
+        mime_types = {
+            'pdf': 'application/pdf',
+            'jpg': 'image/jpeg',
+            'jpeg': 'image/jpeg',
+            'png': 'image/png'
+        }
+        mime_type = mime_types.get(file_ext, 'application/octet-stream')
+        
+        # Screen document with Gemini AI
+        screening_result = screen_verification_document(
+            file_base64, 
+            current_user.company_name,
+            mime_type
+        )
+        
+        # Store document and result
+        product.verification_doc = file_base64
+        product.verification_doc_type = file_ext
+        product.ml_screening_result = json.dumps(screening_result)
+        
+        if screening_result.get('passed', False):
+            product.verification_status = 'pending_review'
+            flash('Document uploaded successfully. Your certificate is now awaiting verifier review.', 'success')
+        else:
+            product.verification_status = 'rejected'
+            product.verification_notes = 'Document did not meet verification requirements. Please upload a valid Authorized Dealer Certificate.'
+            flash('Document did not pass verification screening. Please ensure you upload a valid Authorized Dealer Certificate with proper letterhead, authorization text, and official stamps.', 'error')
+        
+        db.session.commit()
+        return redirect(url_for('producer_product_detail', product_id=product_id))
+    
+    return render_template('upload_verification.html', product=product)
+
+
+# ==========================================
+# VERIFIER ROUTES
+# ==========================================
+
+@app.route('/verifier')
+@login_required
+def verifier_dashboard():
+    """Dashboard for verifiers to see pending documents."""
+    if current_user.role != 'verifier':
+        flash('Access denied. Verifier account required.', 'error')
+        return redirect(url_for('home'))
+    
+    # Get products pending review
+    pending_products = Product.query.filter_by(verification_status='pending_review').all()
+    
+    # Get recently reviewed by this verifier
+    recent_reviews = Product.query.filter_by(verified_by=current_user.id).order_by(Product.verified_at.desc()).limit(10).all()
+    
+    # Stats
+    stats = {
+        'pending': len(pending_products),
+        'approved_today': Product.query.filter(
+            Product.verified_by == current_user.id,
+            Product.verification_status == 'approved',
+            Product.verified_at >= datetime.now().replace(hour=0, minute=0, second=0)
+        ).count(),
+        'rejected_today': Product.query.filter(
+            Product.verified_by == current_user.id,
+            Product.verification_status == 'rejected',
+            Product.verified_at >= datetime.now().replace(hour=0, minute=0, second=0)
+        ).count()
+    }
+    
+    return render_template('verifier_dashboard.html', 
+                          pending_products=pending_products, 
+                          recent_reviews=recent_reviews,
+                          stats=stats)
+
+
+@app.route('/verifier/review/<int:product_id>')
+@login_required
+def verifier_review(product_id):
+    """Review a specific product's verification document."""
+    if current_user.role != 'verifier':
+        flash('Access denied. Verifier account required.', 'error')
+        return redirect(url_for('home'))
+    
+    product = Product.query.get_or_404(product_id)
+    
+    # Parse ML screening result
+    ml_result = {}
+    if product.ml_screening_result:
+        try:
+            ml_result = json.loads(product.ml_screening_result)
+        except:
+            ml_result = {}
+    
+    return render_template('verifier_review.html', product=product, ml_result=ml_result)
+
+
+@app.route('/verifier/approve/<int:product_id>', methods=['POST'])
+@login_required
+def verifier_approve(product_id):
+    """Approve a product's verification."""
+    if current_user.role != 'verifier':
+        flash('Access denied. Verifier account required.', 'error')
+        return redirect(url_for('home'))
+    
+    product = Product.query.get_or_404(product_id)
+    
+    product.verification_status = 'approved'
+    product.verification_notes = request.form.get('notes', 'Approved by verifier')
+    product.verified_by = current_user.id
+    product.verified_at = datetime.now()
+    
+    db.session.commit()
+    flash(f'Product "{product.product_name}" has been approved.', 'success')
+    return redirect(url_for('verifier_dashboard'))
+
+
+@app.route('/verifier/reject/<int:product_id>', methods=['POST'])
+@login_required
+def verifier_reject(product_id):
+    """Reject a product's verification."""
+    if current_user.role != 'verifier':
+        flash('Access denied. Verifier account required.', 'error')
+        return redirect(url_for('home'))
+    
+    product = Product.query.get_or_404(product_id)
+    
+    reason = request.form.get('reason', 'Document not valid')
+    
+    product.verification_status = 'rejected'
+    product.verification_notes = f"Rejected: {reason}"
+    product.verified_by = current_user.id
+    product.verified_at = datetime.now()
+    
+    db.session.commit()
+    flash(f'Product "{product.product_name}" has been rejected.', 'warning')
+    return redirect(url_for('verifier_dashboard'))
+
+
+@app.route('/verifier/document/<int:product_id>')
+@login_required
+def verifier_view_document(product_id):
+    """Serve the verification document for viewing."""
+    if current_user.role != 'verifier':
+        flash('Access denied.', 'error')
+        return redirect(url_for('home'))
+    
+    product = Product.query.get_or_404(product_id)
+    
+    if not product.verification_doc:
+        flash('No document found.', 'error')
+        return redirect(url_for('verifier_dashboard'))
+    
+    import base64
+    from flask import Response
+    
+    doc_data = base64.b64decode(product.verification_doc)
+    
+    mime_types = {
+        'pdf': 'application/pdf',
+        'jpg': 'image/jpeg',
+        'jpeg': 'image/jpeg',
+        'png': 'image/png'
+    }
+    mime_type = mime_types.get(product.verification_doc_type, 'application/octet-stream')
+    
+    return Response(doc_data, mimetype=mime_type)
+
+
 @app.route('/producer/register', methods=['GET', 'POST'])
 @login_required
 def producer_register():
@@ -1045,9 +1602,51 @@ def producer_register():
             link_flipkart = form.get('link_flipkart') or None,
             link_official = form.get('link_official') or None,
             link_other = form.get('link_other') or None,
+            # Verification status
+            verification_status = 'not_submitted',
         )
         db.session.add(p)
         db.session.commit()
+        
+        # Handle verification document upload
+        if 'verification_doc' in request.files:
+            file = request.files['verification_doc']
+            if file and file.filename:
+                allowed_extensions = {'pdf', 'jpg', 'jpeg', 'png'}
+                file_ext = file.filename.rsplit('.', 1)[1].lower() if '.' in file.filename else ''
+                
+                if file_ext in allowed_extensions:
+                    import base64
+                    file_content = file.read()
+                    file_base64 = base64.b64encode(file_content).decode('utf-8')
+                    
+                    mime_types = {
+                        'pdf': 'application/pdf',
+                        'jpg': 'image/jpeg',
+                        'jpeg': 'image/jpeg',
+                        'png': 'image/png'
+                    }
+                    mime_type = mime_types.get(file_ext, 'application/octet-stream')
+                    
+                    # Screen document with Gemini AI
+                    screening_result = screen_verification_document(
+                        file_base64, 
+                        current_user.company_name,
+                        mime_type
+                    )
+                    
+                    # Store document and result
+                    p.verification_doc = file_base64
+                    p.verification_doc_type = file_ext
+                    p.ml_screening_result = json.dumps(screening_result)
+                    
+                    if screening_result.get('passed', False):
+                        p.verification_status = 'pending_review'
+                    else:
+                        p.verification_status = 'rejected'
+                        p.verification_notes = 'Document did not meet verification requirements. Please upload a valid Authorized Dealer Certificate.'
+                    
+                    db.session.commit()
         
         # Calculate ideal score
         product_dict = {
@@ -1070,7 +1669,16 @@ def producer_register():
         db.session.commit()
         
         score_msg = f" Score: {ideal_score:.1f}" if ideal_score else ""
-        flash(f"Product '{p.product_name}' registered.{score_msg}")
+        
+        # Verification status message
+        if p.verification_status == 'pending_review':
+            verify_msg = " Document passed AI screening - awaiting verifier approval."
+        elif p.verification_status == 'rejected':
+            verify_msg = " Document verification failed - please upload a valid certificate."
+        else:
+            verify_msg = " Please upload verification document."
+        
+        flash(f"Product '{p.product_name}' registered.{score_msg}{verify_msg}")
         return redirect(url_for('producer_dashboard'))
     return render_template('producer_register.html')
 
@@ -1129,7 +1737,11 @@ def consumer_dashboard():
         flash('Access denied. Consumer account required.', 'error')
         return redirect(url_for('producer_dashboard'))
     
-    products = Product.query.filter(Product.ideal_score.isnot(None)).order_by(Product.ideal_score.desc()).all()
+    # Only show approved/verified products to consumers
+    products = Product.query.filter(
+        Product.ideal_score.isnot(None),
+        Product.verification_status == 'approved'
+    ).order_by(Product.ideal_score.desc()).all()
     return render_template('consumer_dashboard.html', products=products)
 
 @app.route('/consumer/search')
@@ -1226,6 +1838,12 @@ def consumer_product_detail(product_id):
         return redirect(url_for('producer_dashboard'))
     
     product = Product.query.get_or_404(product_id)
+    
+    # Only allow viewing approved products
+    if product.verification_status != 'approved':
+        flash('This product is not available.', 'error')
+        return redirect(url_for('consumer_dashboard'))
+    
     reviews = Review.query.filter_by(product_id=product_id).order_by(Review.timestamp.desc()).all()
     
     # Check if current user already has a review for this product
@@ -1438,12 +2056,18 @@ def consumer_compare():
     if ids_param:
         try:
             product_ids = [int(id.strip()) for id in ids_param.split(',') if id.strip()][:3]  # Max 3
-            selected_products = Product.query.filter(Product.id.in_(product_ids)).all()
+            selected_products = Product.query.filter(
+                Product.id.in_(product_ids),
+                Product.verification_status == 'approved'
+            ).all()
         except ValueError:
             pass
     
-    # Get all products for the selector
-    all_products = Product.query.filter(Product.ideal_score.isnot(None)).order_by(Product.product_name).all()
+    # Get all products for the selector (only approved)
+    all_products = Product.query.filter(
+        Product.ideal_score.isnot(None),
+        Product.verification_status == 'approved'
+    ).order_by(Product.product_name).all()
     
     # Calculate comparison data
     comparison_data = []
@@ -1481,6 +2105,7 @@ def api_product_search():
     
     products = Product.query.filter(
         Product.ideal_score.isnot(None),
+        Product.verification_status == 'approved',
         (Product.product_name.ilike(f'%{query}%') | Product.company_name.ilike(f'%{query}%'))
     ).limit(10).all()
     
@@ -1652,10 +2277,21 @@ def seed_database():
             
             # Clear existing data if force=true
             if request.args.get('force') == 'true':
+                # Clear all tables with foreign keys in correct order
+                ChatMessage.query.delete()
+                PriceAlert.query.delete()
+                PriceHistory.query.delete()
                 Review.query.delete()
                 Product.query.delete()
                 User.query.delete()
                 db.session.commit()
+                
+                # Clean up old QR code files
+                qr_dir = os.path.join(BASE_DIR, 'static', 'qr_codes')
+                if os.path.exists(qr_dir):
+                    for f in os.listdir(qr_dir):
+                        if f.startswith('product_') and f.endswith('.png'):
+                            os.remove(os.path.join(qr_dir, f))
         
         # Seed users
         users_created = 0
@@ -1678,6 +2314,11 @@ def seed_database():
             # Generate search links for e-commerce sites
             links = generate_search_links(p_data['product_name'], p_data['company_name'])
             
+            # Calculate ideal_score dynamically if not provided
+            ideal_score = p_data.get('ideal_score')
+            if ideal_score is None:
+                ideal_score = score_product_from_db(p_data, db.session)
+            
             product = Product(
                 company_name=p_data['company_name'],
                 product_name=p_data['product_name'],
@@ -1691,7 +2332,7 @@ def seed_database():
                 camera_mp=p_data['camera_mp'],
                 price_usd=p_data['price_usd'],
                 weight_g=p_data['weight_g'],
-                ideal_score=p_data['ideal_score'],
+                ideal_score=ideal_score,
                 processor_model=p_data.get('processor_model'),
                 ram_type=p_data.get('ram_type'),
                 storage_type=p_data.get('storage_type'),
@@ -1706,10 +2347,20 @@ def seed_database():
                 link_flipkart=links['link_flipkart'],
                 link_official=links['link_official'],
                 link_other=links['link_other'],
+                # Set verification status to approved for seeded products
+                verification_status='approved',
             )
             db.session.add(product)
             products_created += 1
         
+        db.session.commit()
+        
+        # Generate QR codes for all seeded products
+        all_products = Product.query.all()
+        for product in all_products:
+            if not product.qr_code_path:
+                qr_path = _generate_qr_code(product)
+                product.qr_code_path = qr_path
         db.session.commit()
         
         return jsonify({
