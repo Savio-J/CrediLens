@@ -522,7 +522,7 @@ except Exception as e:
     pass  # HF client initialization failed, will retry on first use
 
 # Emotion to score mapping (1-5 scale)
-# Based on michellejieli/emotion_text_classifier model outputs
+# Based on michelleli99/emotion_text_classifier model outputs
 # These represent the sentiment polarity of each emotion
 EMOTION_SCORES = {
     'joy': 5.0,           # Very positive
@@ -569,7 +569,7 @@ def analyze_emotion(text):
     try:
         result = hf_client.text_classification(
             text,
-            model="michellejieli/emotion_text_classifier",
+            model="michelleli99/emotion_text_classifier",
         )
         
         # Store all emotions with their scores
