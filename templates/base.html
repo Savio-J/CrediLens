@@ -57,7 +57,7 @@
                         {% endif %}
                         <!-- Profile Dropdown -->
                         <div class="relative" x-data="{ open: false }">
-                            <button onclick="toggleProfileMenu()" class="flex items-center space-x-2 text-sm font-medium text-gray-500 hover:text-blue-600 transition focus:outline-none">
+                            <button id="profileButton" onclick="toggleProfileMenu(event)" class="flex items-center space-x-2 text-sm font-medium text-gray-500 hover:text-blue-600 transition focus:outline-none">
                                 <div class="w-8 h-8 bg-gradient-to-br from-blue-500 to-cyan-500 rounded-full flex items-center justify-center">
                                     <span class="text-sm font-bold text-white">{{ current_user.username[0].upper() }}</span>
                                 </div>
@@ -66,12 +66,12 @@
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
                                 </svg>
                             </button>
-                            <div id="profileMenu" class="hidden absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg py-1 z-50 border border-gray-200">
+                            <div id="profileMenu" class="hidden absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg py-1 z-50 border border-gray-200" style="touch-action: manipulation;">
                                 <div class="px-4 py-2 border-b border-gray-100">
                                     <p class="text-sm font-medium text-gray-900">{{ current_user.username }}</p>
                                     <p class="text-xs text-gray-500 capitalize">{{ current_user.role }}</p>
                                 </div>
-                                <a href="{{ url_for('profile') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                <a href="{{ url_for('profile') }}" class="block px-4 py-3 text-sm text-gray-700 hover:bg-gray-100 active:bg-gray-200" style="touch-action: manipulation;">
                                     <span class="flex items-center">
                                         <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
@@ -79,7 +79,7 @@
                                         My Profile
                                     </span>
                                 </a>
-                                <a href="{{ url_for('logout') }}" class="block px-4 py-2 text-sm text-red-600 hover:bg-red-50">
+                                <a href="{{ url_for('logout') }}" class="block px-4 py-3 text-sm text-red-600 hover:bg-red-50 active:bg-red-100" style="touch-action: manipulation;">
                                     <span class="flex items-center">
                                         <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
@@ -98,17 +98,39 @@
     </nav>
     
     <script>
-        function toggleProfileMenu() {
+        let profileMenuOpen = false;
+        
+        function toggleProfileMenu(event) {
+            if (event) {
+                event.preventDefault();
+                event.stopPropagation();
+            }
             const menu = document.getElementById('profileMenu');
-            menu.classList.toggle('hidden');
+            profileMenuOpen = !profileMenuOpen;
+            if (profileMenuOpen) {
+                menu.classList.remove('hidden');
+            } else {
+                menu.classList.add('hidden');
+            }
         }
         
-        // Close menu when clicking outside
+        // Close menu when clicking/touching outside - works on mobile
         document.addEventListener('click', function(event) {
             const menu = document.getElementById('profileMenu');
-            const button = event.target.closest('button');
-            if (menu && !menu.contains(event.target) && (!button || !button.onclick)) {
+            const profileButton = document.getElementById('profileButton');
+            if (menu && profileMenuOpen && !menu.contains(event.target) && !profileButton.contains(event.target)) {
                 menu.classList.add('hidden');
+                profileMenuOpen = false;
+            }
+        });
+        
+        // Also handle touch events for mobile
+        document.addEventListener('touchend', function(event) {
+            const menu = document.getElementById('profileMenu');
+            const profileButton = document.getElementById('profileButton');
+            if (menu && profileMenuOpen && !menu.contains(event.target) && !profileButton.contains(event.target)) {
+                menu.classList.add('hidden');
+                profileMenuOpen = false;
             }
         });
     </script>
