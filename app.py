@@ -50,11 +50,12 @@ app.secret_key = os.environ.get('SECRET_KEY', 'dev-secret')
 # SESSION TIMEOUT CONFIGURATION
 # ==========================================
 # Default session timeout: 30 minutes of inactivity
-# Remember Me: 7 days
+# Sessions expire when browser is closed (no persistent remember me)
 SESSION_TIMEOUT_MINUTES = 30
-REMEMBER_ME_DAYS = 7
 
-app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(days=REMEMBER_ME_DAYS)
+# Session cookie expires when browser closes (not persistent)
+app.config['SESSION_COOKIE_SAMESITE'] = 'Lax'
+app.config['REMEMBER_COOKIE_DURATION'] = timedelta(seconds=1)  # Effectively disable remember me
 
 # Database
 db = SQLAlchemy(app)
@@ -81,13 +82,7 @@ def check_session_timeout():
     if request.endpoint in ['login', 'logout', 'signup', 'home']:
         return
     
-    # Check if user chose "Remember Me"
-    if session.get('remember_me'):
-        # For "Remember Me" users, just update last activity (no timeout)
-        session['last_activity'] = datetime.now().isoformat()
-        return
-    
-    # Check inactivity timeout for non-remembered sessions
+    # Check inactivity timeout
     last_activity = session.get('last_activity')
     
     if last_activity:
@@ -1037,19 +1032,17 @@ def login():
         username = request.form.get('username', '').strip()
         password = request.form.get('password', '')
         user_type = request.form.get('user_type', 'consumer')  # 'consumer', 'producer', or 'verifier'
-        remember_me = request.form.get('remember_me') == 'on'  # Checkbox value
         
         user = User.query.filter_by(username=username).first()
         
         if user and check_password_hash(user.password, password):
             if user.role == user_type:
-                # Log in with remember option
-                login_user(user, remember=remember_me)
+                # Log in without remember (session expires on browser close)
+                login_user(user, remember=False)
                 
                 # Set session variables for timeout tracking
                 session['last_activity'] = datetime.now().isoformat()
-                session['remember_me'] = remember_me
-                session.permanent = True  # Use PERMANENT_SESSION_LIFETIME
+                session.permanent = False  # Session expires when browser closes
                 
                 flash(f'Welcome back, {username}!', 'success')
                 if user.role == 'producer':
@@ -2074,7 +2067,7 @@ def consumer_compare():
     for product in selected_products:
         # Get review stats
         reviews = Review.query.filter_by(product_id=product.id).all()
-        avg_rating = sum(r.rating for r in reviews) / len(reviews) if reviews else 0
+        avg_rating = sum(r.average_rating for r in reviews) / len(reviews) if reviews else 0
         review_count = len(reviews)
         
         # Calculate credibility percentage

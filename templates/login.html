@@ -31,12 +31,6 @@
                 <input type="hidden" name="user_type" value="producer">
                 <input type="text" name="username" placeholder="Username" class="input" required />
                 <input type="password" name="password" placeholder="Password" class="input" required />
-                <div class="remember-me">
-                    <label class="checkbox-label">
-                        <input type="checkbox" name="remember_me" />
-                        <span>Remember me for 7 days</span>
-                    </label>
-                </div>
                 <button type="submit" class="btn">Sign In</button>
                 <p class="form__link">Don't have an account? <a href="{{ url_for('signup') }}">Sign Up</a></p>
             </form>
@@ -50,12 +44,6 @@
                 <input type="hidden" name="user_type" value="consumer">
                 <input type="text" name="username" placeholder="Username" class="input" required />
                 <input type="password" name="password" placeholder="Password" class="input" required />
-                <div class="remember-me">
-                    <label class="checkbox-label">
-                        <input type="checkbox" name="remember_me" />
-                        <span>Remember me for 7 days</span>
-                    </label>
-                </div>
                 <button type="submit" class="btn">Sign In</button>
                 <p class="form__link">Don't have an account? <a href="{{ url_for('signup') }}">Sign Up</a></p>
                 <p class="form__link" style="margin-top: 8px; font-size: 12px;"><a href="#" onclick="showVerifierLogin()">Verifier Login</a></p>
