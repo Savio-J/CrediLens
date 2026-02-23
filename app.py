@@ -943,11 +943,19 @@ To manage your alerts, visit CrediLens and go to "My Alerts".
         msg.attach(MIMEText(text, 'plain'))
         msg.attach(MIMEText(html, 'html'))
         
-        # Send email
-        with smtplib.SMTP(smtp_server, smtp_port) as server:
-            server.starttls()
-            server.login(sender_email, sender_password)
-            server.sendmail(sender_email, recipient_email, msg.as_string())
+        # Send email - try SSL first (port 465), fallback to TLS (port 587)
+        try:
+            # Try SSL connection (port 465) - often less restricted on cloud hosts
+            with smtplib.SMTP_SSL(smtp_server, 465, timeout=30) as server:
+                server.login(sender_email, sender_password)
+                server.sendmail(sender_email, recipient_email, msg.as_string())
+        except Exception as ssl_error:
+            print(f"[Alert Email] SSL (port 465) failed: {ssl_error}, trying TLS (port 587)...")
+            # Fallback to TLS (port 587)
+            with smtplib.SMTP(smtp_server, smtp_port, timeout=30) as server:
+                server.starttls()
+                server.login(sender_email, sender_password)
+                server.sendmail(sender_email, recipient_email, msg.as_string())
         
         print(f"[Alert Email] SUCCESS - Sent to {recipient_email} for {product_name}")
         return True
