@@ -2,28 +2,28 @@
 {% block content %}
 <div class="max-w-7xl mx-auto">
     <!-- Back Button -->
-    <a href="/consumer" class="text-gray-500 hover:text-blue-600 mb-6 inline-block flex items-center">
+    <a href="/consumer" class="text-gray-500 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-400 mb-6 inline-block flex items-center">
         <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg> 
         Back to Products
     </a>
 
     <!-- Header -->
     <div class="mb-8">
-        <h2 class="text-3xl font-bold text-gray-900 mb-2">Compare Products</h2>
-        <p class="text-gray-500">Select up to 3 products to compare side by side</p>
+        <h2 class="text-3xl font-bold text-gray-900 dark:text-white mb-2">Compare Products</h2>
+        <p class="text-gray-500 dark:text-slate-400">Select up to 3 products to compare side by side</p>
     </div>
 
     <!-- Product Selector -->
     <div class="glass-panel p-6 mb-8">
-        <h3 class="font-bold text-gray-900 mb-4 flex items-center">
-            <svg class="w-5 h-5 mr-2 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path></svg>
+        <h3 class="font-bold text-gray-900 dark:text-white mb-4 flex items-center">
+            <svg class="w-5 h-5 mr-2 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path></svg>
             Select Products to Compare
         </h3>
         
         <div class="flex flex-wrap gap-4 items-center">
             <!-- Product Selector Dropdowns -->
             <div class="flex-1 min-w-[200px]">
-                <select id="product1" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                <select id="product1" class="w-full p-3 border border-gray-300 dark:border-slate-600 dark:bg-slate-700 dark:text-white rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
                     <option value="">Select Product 1</option>
                     {% for product in all_products %}
                     <option value="{{ product.id }}" {% if product.id in selected_ids %}selected{% endif %}>
@@ -34,7 +34,7 @@
             </div>
             
             <div class="flex-1 min-w-[200px]">
-                <select id="product2" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                <select id="product2" class="w-full p-3 border border-gray-300 dark:border-slate-600 dark:bg-slate-700 dark:text-white rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
                     <option value="">Select Product 2</option>
                     {% for product in all_products %}
                     <option value="{{ product.id }}" {% if product.id in selected_ids and loop.index > 1 %}selected{% endif %}>
@@ -45,7 +45,7 @@
             </div>
             
             <div class="flex-1 min-w-[200px]">
-                <select id="product3" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                <select id="product3" class="w-full p-3 border border-gray-300 dark:border-slate-600 dark:bg-slate-700 dark:text-white rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
                     <option value="">Select Product 3 (Optional)</option>
                     {% for product in all_products %}
                     <option value="{{ product.id }}">
@@ -66,181 +66,181 @@
     <!-- Comparison Table -->
     <div class="glass-panel overflow-hidden">
         <!-- Product Headers -->
-        <div class="grid grid-cols-{{ comparison_data|length + 1 }} border-b border-gray-200">
-            <div class="p-4 bg-gray-50 font-bold text-gray-600">Specification</div>
+        <div class="grid grid-cols-{{ comparison_data|length + 1 }} border-b border-gray-200 dark:border-slate-700">
+            <div class="p-4 bg-gray-50 dark:bg-slate-800 font-bold text-gray-600 dark:text-slate-300">Specification</div>
             {% for item in comparison_data %}
-            <div class="p-4 bg-gray-50 text-center border-l border-gray-200">
-                <h3 class="font-bold text-lg text-gray-900">{{ item.product.product_name }}</h3>
-                <p class="text-sm text-gray-500">{{ item.product.company_name }}</p>
-                <a href="/consumer/product/{{ item.product.id }}" class="text-blue-600 text-xs hover:underline">View Details →</a>
+            <div class="p-4 bg-gray-50 dark:bg-slate-800 text-center border-l border-gray-200 dark:border-slate-700">
+                <h3 class="font-bold text-lg text-gray-900 dark:text-white">{{ item.product.product_name }}</h3>
+                <p class="text-sm text-gray-500 dark:text-slate-400">{{ item.product.company_name }}</p>
+                <a href="/consumer/product/{{ item.product.id }}" class="text-blue-600 dark:text-blue-400 text-xs hover:underline">View Details →</a>
             </div>
             {% endfor %}
         </div>
 
         <!-- Score Row -->
-        <div class="grid grid-cols-{{ comparison_data|length + 1 }} border-b border-gray-200 bg-blue-50">
-            <div class="p-4 font-semibold text-gray-700 flex items-center">
+        <div class="grid grid-cols-{{ comparison_data|length + 1 }} border-b border-gray-200 dark:border-slate-700 bg-blue-50 dark:bg-blue-900/20">
+            <div class="p-4 font-semibold text-gray-700 dark:text-slate-200 flex items-center">
                 <svg class="w-5 h-5 mr-2 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"></path></svg>
                 Credibility Score
             </div>
             {% for item in comparison_data %}
             {% set score = item.product.ideal_score %}
-            <div class="p-4 text-center border-l border-gray-200">
+            <div class="p-4 text-center border-l border-gray-200 dark:border-slate-700">
                 {% if score >= 70 %}
-                <span class="inline-block bg-green-100 text-green-800 px-4 py-2 rounded-lg font-bold text-2xl">{{ "%.1f"|format(score) }}</span>
+                <span class="inline-block bg-green-100 dark:bg-green-900/40 text-green-800 dark:text-green-300 px-4 py-2 rounded-lg font-bold text-2xl">{{ "%.1f"|format(score) }}</span>
                 {% elif score >= 50 %}
-                <span class="inline-block bg-yellow-100 text-yellow-800 px-4 py-2 rounded-lg font-bold text-2xl">{{ "%.1f"|format(score) }}</span>
+                <span class="inline-block bg-yellow-100 dark:bg-yellow-900/40 text-yellow-800 dark:text-yellow-300 px-4 py-2 rounded-lg font-bold text-2xl">{{ "%.1f"|format(score) }}</span>
                 {% else %}
-                <span class="inline-block bg-red-100 text-red-800 px-4 py-2 rounded-lg font-bold text-2xl">{{ "%.1f"|format(score) }}</span>
+                <span class="inline-block bg-red-100 dark:bg-red-900/40 text-red-800 dark:text-red-300 px-4 py-2 rounded-lg font-bold text-2xl">{{ "%.1f"|format(score) }}</span>
                 {% endif %}
             </div>
             {% endfor %}
         </div>
 
         <!-- Price Row -->
-        <div class="grid grid-cols-{{ comparison_data|length + 1 }} border-b border-gray-200">
-            <div class="p-4 font-semibold text-gray-700">💰 Price</div>
+        <div class="grid grid-cols-{{ comparison_data|length + 1 }} border-b border-gray-200 dark:border-slate-700">
+            <div class="p-4 font-semibold text-gray-700 dark:text-slate-200">💰 Price</div>
             {% set prices = comparison_data|map(attribute='product.price_usd')|list %}
             {% set min_price = prices|min %}
             {% for item in comparison_data %}
-            <div class="p-4 text-center border-l border-gray-200">
-                <span class="font-bold text-lg {% if item.product.price_usd == min_price %}text-green-600{% endif %}">
+            <div class="p-4 text-center border-l border-gray-200 dark:border-slate-700">
+                <span class="font-bold text-lg {% if item.product.price_usd == min_price %}text-green-600 dark:text-green-400{% else %}dark:text-white{% endif %}">
                     ${{ "%.0f"|format(item.product.price_usd or 0) }}
                 </span>
                 {% if item.product.price_usd == min_price and comparison_data|length > 1 %}
-                <span class="ml-2 text-xs bg-green-100 text-green-700 px-2 py-1 rounded">Best</span>
+                <span class="ml-2 text-xs bg-green-100 dark:bg-green-900/40 text-green-700 dark:text-green-300 px-2 py-1 rounded">Best</span>
                 {% endif %}
             </div>
             {% endfor %}
         </div>
 
         <!-- Processor Score -->
-        <div class="grid grid-cols-{{ comparison_data|length + 1 }} border-b border-gray-200 bg-gray-50">
-            <div class="p-4 font-semibold text-gray-700">⚡ Processor Score</div>
+        <div class="grid grid-cols-{{ comparison_data|length + 1 }} border-b border-gray-200 dark:border-slate-700 bg-gray-50 dark:bg-slate-800/50">
+            <div class="p-4 font-semibold text-gray-700 dark:text-slate-200">⚡ Processor Score</div>
             {% set vals = comparison_data|map(attribute='product.processor_score')|list %}
             {% set max_val = vals|max %}
             {% for item in comparison_data %}
-            <div class="p-4 text-center border-l border-gray-200">
-                <span class="font-medium {% if item.product.processor_score == max_val and comparison_data|length > 1 %}text-green-600 font-bold{% endif %}">
+            <div class="p-4 text-center border-l border-gray-200 dark:border-slate-700">
+                <span class="font-medium {% if item.product.processor_score == max_val and comparison_data|length > 1 %}text-green-600 dark:text-green-400 font-bold{% else %}dark:text-white{% endif %}">
                     {{ item.product.processor_score|int if item.product.processor_score else 'N/A' }}
                 </span>
                 {% if item.product.processor_score == max_val and comparison_data|length > 1 %}
-                <span class="ml-2 text-xs bg-green-100 text-green-700 px-2 py-1 rounded">Best</span>
+                <span class="ml-2 text-xs bg-green-100 dark:bg-green-900/40 text-green-700 dark:text-green-300 px-2 py-1 rounded">Best</span>
                 {% endif %}
             </div>
             {% endfor %}
         </div>
 
         <!-- RAM -->
-        <div class="grid grid-cols-{{ comparison_data|length + 1 }} border-b border-gray-200">
-            <div class="p-4 font-semibold text-gray-700">🧠 RAM</div>
+        <div class="grid grid-cols-{{ comparison_data|length + 1 }} border-b border-gray-200 dark:border-slate-700">
+            <div class="p-4 font-semibold text-gray-700 dark:text-slate-200">🧠 RAM</div>
             {% set vals = comparison_data|map(attribute='product.ram_gb')|list %}
             {% set max_val = vals|max %}
             {% for item in comparison_data %}
-            <div class="p-4 text-center border-l border-gray-200">
-                <span class="font-medium {% if item.product.ram_gb == max_val and comparison_data|length > 1 %}text-green-600 font-bold{% endif %}">
+            <div class="p-4 text-center border-l border-gray-200 dark:border-slate-700">
+                <span class="font-medium {% if item.product.ram_gb == max_val and comparison_data|length > 1 %}text-green-600 dark:text-green-400 font-bold{% else %}dark:text-white{% endif %}">
                     {{ item.product.ram_gb }} GB
                 </span>
                 {% if item.product.ram_gb == max_val and comparison_data|length > 1 %}
-                <span class="ml-2 text-xs bg-green-100 text-green-700 px-2 py-1 rounded">Best</span>
+                <span class="ml-2 text-xs bg-green-100 dark:bg-green-900/40 text-green-700 dark:text-green-300 px-2 py-1 rounded">Best</span>
                 {% endif %}
             </div>
             {% endfor %}
         </div>
 
         <!-- Storage -->
-        <div class="grid grid-cols-{{ comparison_data|length + 1 }} border-b border-gray-200 bg-gray-50">
-            <div class="p-4 font-semibold text-gray-700">💾 Storage</div>
+        <div class="grid grid-cols-{{ comparison_data|length + 1 }} border-b border-gray-200 dark:border-slate-700 bg-gray-50 dark:bg-slate-800/50">
+            <div class="p-4 font-semibold text-gray-700 dark:text-slate-200">💾 Storage</div>
             {% set vals = comparison_data|map(attribute='product.storage_gb')|list %}
             {% set max_val = vals|max %}
             {% for item in comparison_data %}
-            <div class="p-4 text-center border-l border-gray-200">
-                <span class="font-medium {% if item.product.storage_gb == max_val and comparison_data|length > 1 %}text-green-600 font-bold{% endif %}">
+            <div class="p-4 text-center border-l border-gray-200 dark:border-slate-700">
+                <span class="font-medium {% if item.product.storage_gb == max_val and comparison_data|length > 1 %}text-green-600 dark:text-green-400 font-bold{% else %}dark:text-white{% endif %}">
                     {{ item.product.storage_gb }} GB
                 </span>
                 {% if item.product.storage_gb == max_val and comparison_data|length > 1 %}
-                <span class="ml-2 text-xs bg-green-100 text-green-700 px-2 py-1 rounded">Best</span>
+                <span class="ml-2 text-xs bg-green-100 dark:bg-green-900/40 text-green-700 dark:text-green-300 px-2 py-1 rounded">Best</span>
                 {% endif %}
             </div>
             {% endfor %}
         </div>
 
         <!-- Battery -->
-        <div class="grid grid-cols-{{ comparison_data|length + 1 }} border-b border-gray-200">
-            <div class="p-4 font-semibold text-gray-700">🔋 Battery</div>
+        <div class="grid grid-cols-{{ comparison_data|length + 1 }} border-b border-gray-200 dark:border-slate-700">
+            <div class="p-4 font-semibold text-gray-700 dark:text-slate-200">🔋 Battery</div>
             {% set vals = comparison_data|map(attribute='product.battery_mah')|list %}
             {% set max_val = vals|max %}
             {% for item in comparison_data %}
-            <div class="p-4 text-center border-l border-gray-200">
-                <span class="font-medium {% if item.product.battery_mah == max_val and comparison_data|length > 1 %}text-green-600 font-bold{% endif %}">
+            <div class="p-4 text-center border-l border-gray-200 dark:border-slate-700">
+                <span class="font-medium {% if item.product.battery_mah == max_val and comparison_data|length > 1 %}text-green-600 dark:text-green-400 font-bold{% else %}dark:text-white{% endif %}">
                     {{ item.product.battery_mah|int }} mAh
                 </span>
                 {% if item.product.battery_mah == max_val and comparison_data|length > 1 %}
-                <span class="ml-2 text-xs bg-green-100 text-green-700 px-2 py-1 rounded">Best</span>
+                <span class="ml-2 text-xs bg-green-100 dark:bg-green-900/40 text-green-700 dark:text-green-300 px-2 py-1 rounded">Best</span>
                 {% endif %}
             </div>
             {% endfor %}
         </div>
 
         <!-- Screen Size -->
-        <div class="grid grid-cols-{{ comparison_data|length + 1 }} border-b border-gray-200 bg-gray-50">
-            <div class="p-4 font-semibold text-gray-700">📱 Screen Size</div>
+        <div class="grid grid-cols-{{ comparison_data|length + 1 }} border-b border-gray-200 dark:border-slate-700 bg-gray-50 dark:bg-slate-800/50">
+            <div class="p-4 font-semibold text-gray-700 dark:text-slate-200">📱 Screen Size</div>
             {% set vals = comparison_data|map(attribute='product.screen_inches')|list %}
             {% set max_val = vals|max %}
             {% for item in comparison_data %}
-            <div class="p-4 text-center border-l border-gray-200">
-                <span class="font-medium {% if item.product.screen_inches == max_val and comparison_data|length > 1 %}text-green-600 font-bold{% endif %}">
+            <div class="p-4 text-center border-l border-gray-200 dark:border-slate-700">
+                <span class="font-medium {% if item.product.screen_inches == max_val and comparison_data|length > 1 %}text-green-600 dark:text-green-400 font-bold{% else %}dark:text-white{% endif %}">
                     {{ item.product.screen_inches }}"
                 </span>
                 {% if item.product.screen_inches == max_val and comparison_data|length > 1 %}
-                <span class="ml-2 text-xs bg-green-100 text-green-700 px-2 py-1 rounded">Best</span>
+                <span class="ml-2 text-xs bg-green-100 dark:bg-green-900/40 text-green-700 dark:text-green-300 px-2 py-1 rounded">Best</span>
                 {% endif %}
             </div>
             {% endfor %}
         </div>
 
         <!-- Camera -->
-        <div class="grid grid-cols-{{ comparison_data|length + 1 }} border-b border-gray-200">
-            <div class="p-4 font-semibold text-gray-700">📷 Camera</div>
+        <div class="grid grid-cols-{{ comparison_data|length + 1 }} border-b border-gray-200 dark:border-slate-700">
+            <div class="p-4 font-semibold text-gray-700 dark:text-slate-200">📷 Camera</div>
             {% set vals = comparison_data|map(attribute='product.camera_mp')|list %}
             {% set max_val = vals|max %}
             {% for item in comparison_data %}
-            <div class="p-4 text-center border-l border-gray-200">
-                <span class="font-medium {% if item.product.camera_mp == max_val and comparison_data|length > 1 %}text-green-600 font-bold{% endif %}">
+            <div class="p-4 text-center border-l border-gray-200 dark:border-slate-700">
+                <span class="font-medium {% if item.product.camera_mp == max_val and comparison_data|length > 1 %}text-green-600 dark:text-green-400 font-bold{% else %}dark:text-white{% endif %}">
                     {{ item.product.camera_mp|int }} MP
                 </span>
                 {% if item.product.camera_mp == max_val and comparison_data|length > 1 %}
-                <span class="ml-2 text-xs bg-green-100 text-green-700 px-2 py-1 rounded">Best</span>
+                <span class="ml-2 text-xs bg-green-100 dark:bg-green-900/40 text-green-700 dark:text-green-300 px-2 py-1 rounded">Best</span>
                 {% endif %}
             </div>
             {% endfor %}
         </div>
 
         <!-- Weight -->
-        <div class="grid grid-cols-{{ comparison_data|length + 1 }} border-b border-gray-200 bg-gray-50">
-            <div class="p-4 font-semibold text-gray-700">⚖️ Weight</div>
+        <div class="grid grid-cols-{{ comparison_data|length + 1 }} border-b border-gray-200 dark:border-slate-700 bg-gray-50 dark:bg-slate-800/50">
+            <div class="p-4 font-semibold text-gray-700 dark:text-slate-200">⚖️ Weight</div>
             {% set vals = comparison_data|map(attribute='product.weight_g')|list %}
             {% set min_val = vals|min %}
             {% for item in comparison_data %}
-            <div class="p-4 text-center border-l border-gray-200">
-                <span class="font-medium {% if item.product.weight_g == min_val and comparison_data|length > 1 %}text-green-600 font-bold{% endif %}">
+            <div class="p-4 text-center border-l border-gray-200 dark:border-slate-700">
+                <span class="font-medium {% if item.product.weight_g == min_val and comparison_data|length > 1 %}text-green-600 dark:text-green-400 font-bold{% else %}dark:text-white{% endif %}">
                     {{ item.product.weight_g|int }} g
                 </span>
                 {% if item.product.weight_g == min_val and comparison_data|length > 1 %}
-                <span class="ml-2 text-xs bg-green-100 text-green-700 px-2 py-1 rounded">Lightest</span>
+                <span class="ml-2 text-xs bg-green-100 dark:bg-green-900/40 text-green-700 dark:text-green-300 px-2 py-1 rounded">Lightest</span>
                 {% endif %}
             </div>
             {% endfor %}
         </div>
 
         <!-- User Reviews Section -->
-        <div class="grid grid-cols-{{ comparison_data|length + 1 }} border-b border-gray-200">
-            <div class="p-4 font-semibold text-gray-700">⭐ Avg Rating</div>
+        <div class="grid grid-cols-{{ comparison_data|length + 1 }} border-b border-gray-200 dark:border-slate-700">
+            <div class="p-4 font-semibold text-gray-700 dark:text-slate-200">⭐ Avg Rating</div>
             {% set vals = comparison_data|map(attribute='avg_rating')|list %}
             {% set max_val = vals|max %}
             {% for item in comparison_data %}
-            <div class="p-4 text-center border-l border-gray-200">
-                <span class="font-medium {% if item.avg_rating == max_val and comparison_data|length > 1 and item.avg_rating > 0 %}text-green-600 font-bold{% endif %}">
+            <div class="p-4 text-center border-l border-gray-200 dark:border-slate-700">
+                <span class="font-medium {% if item.avg_rating == max_val and comparison_data|length > 1 and item.avg_rating > 0 %}text-green-600 dark:text-green-400 font-bold{% else %}dark:text-white{% endif %}">
                     {% if item.avg_rating > 0 %}
                     {{ item.avg_rating }}/5 ({{ item.review_count }} reviews)
                     {% else %}
@@ -252,16 +252,16 @@
         </div>
 
         <!-- Review Credibility -->
-        <div class="grid grid-cols-{{ comparison_data|length + 1 }} bg-gray-50">
-            <div class="p-4 font-semibold text-gray-700">🛡️ Review Credibility</div>
+        <div class="grid grid-cols-{{ comparison_data|length + 1 }} bg-gray-50 dark:bg-slate-800/50">
+            <div class="p-4 font-semibold text-gray-700 dark:text-slate-200">🛡️ Review Credibility</div>
             {% for item in comparison_data %}
-            <div class="p-4 text-center border-l border-gray-200">
+            <div class="p-4 text-center border-l border-gray-200 dark:border-slate-700">
                 {% if item.review_count > 0 %}
-                <span class="font-medium {% if item.credibility_pct >= 80 %}text-green-600{% elif item.credibility_pct >= 50 %}text-yellow-600{% else %}text-red-600{% endif %}">
+                <span class="font-medium {% if item.credibility_pct >= 80 %}text-green-600 dark:text-green-400{% elif item.credibility_pct >= 50 %}text-yellow-600 dark:text-yellow-400{% else %}text-red-600 dark:text-red-400{% endif %}">
                     {{ item.credibility_pct|int }}% Genuine
                 </span>
                 {% else %}
-                <span class="text-gray-400">N/A</span>
+                <span class="text-gray-400 dark:text-slate-500">N/A</span>
                 {% endif %}
             </div>
             {% endfor %}
@@ -270,8 +270,8 @@
 
     <!-- Radar Chart -->
     <div class="glass-panel p-6 mt-8">
-        <h3 class="font-bold text-gray-900 mb-2">Visual Comparison</h3>
-        <p class="text-sm text-gray-500 mb-4">Each axis shows relative performance (0-100%). Hover over points to see actual values.</p>
+        <h3 class="font-bold text-gray-900 dark:text-white mb-2">Visual Comparison</h3>
+        <p class="text-sm text-gray-500 dark:text-slate-400 mb-4">Each axis shows relative performance (0-100%). Hover over points to see actual values.</p>
         <div class="flex justify-center">
             <div style="width: 400px; height: 400px;">
                 <canvas id="comparisonChart"></canvas>
@@ -286,9 +286,9 @@
     {% else %}
     <!-- Empty State -->
     <div class="glass-panel p-12 text-center">
-        <svg class="w-16 h-16 mx-auto text-gray-400 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
-        <h3 class="text-xl font-bold text-gray-900 mb-2">No Products Selected</h3>
-        <p class="text-gray-500">Use the dropdowns above to select products to compare</p>
+        <svg class="w-16 h-16 mx-auto text-gray-400 dark:text-slate-500 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
+        <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-2">No Products Selected</h3>
+        <p class="text-gray-500 dark:text-slate-400">Use the dropdowns above to select products to compare</p>
     </div>
     {% endif %}
 </div>

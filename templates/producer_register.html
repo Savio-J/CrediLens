@@ -1,30 +1,30 @@
 {% extends "base.html" %}
 {% block content %}
 <div class="max-w-3xl mx-auto">
-    <a href="/producer" class="text-gray-500 hover:text-blue-600 mb-4 inline-block flex items-center">
+    <a href="/producer" class="text-gray-500 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-400 mb-4 inline-block flex items-center">
         <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg> Back to Dashboard
     </a>
     
     <div class="glass-panel p-8">
-        <h2 class="text-2xl font-bold text-gray-900 mb-2 border-b pb-4">Register Product</h2>
-        <p class="text-gray-500 mb-6">Registering for: <span class="font-semibold text-blue-600">{{ current_user.company_name }}</span></p>
+        <h2 class="text-2xl font-bold text-gray-900 dark:text-white mb-2 border-b dark:border-slate-700 pb-4">Register Product</h2>
+        <p class="text-gray-500 dark:text-slate-400 mb-6">Registering for: <span class="font-semibold text-blue-600 dark:text-blue-400">{{ current_user.company_name }}</span></p>
         
         <form action="/producer/register" method="post" enctype="multipart/form-data">
             <!-- Basic Info -->
             <div class="mb-8">
-                <h4 class="text-sm uppercase tracking-wide text-gray-500 font-bold mb-4">Basic Information</h4>
+                <h4 class="text-sm uppercase tracking-wide text-gray-500 dark:text-slate-400 font-bold mb-4">Basic Information</h4>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Product Name</label>
-                        <input name="product_name" type="text" class="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 p-2 border" placeholder="e.g. iPhone 16 Pro" required>
+                        <label class="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">Product Name</label>
+                        <input name="product_name" type="text" class="w-full rounded-md border-gray-300 dark:border-slate-600 dark:bg-slate-700 dark:text-white shadow-sm focus:border-blue-500 focus:ring-blue-500 p-2 border" placeholder="e.g. iPhone 16 Pro" required>
                     </div>
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Batch Number</label>
-                        <input name="batch_number" type="text" class="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 p-2 border">
+                        <label class="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">Batch Number</label>
+                        <input name="batch_number" type="text" class="w-full rounded-md border-gray-300 dark:border-slate-600 dark:bg-slate-700 dark:text-white shadow-sm focus:border-blue-500 focus:ring-blue-500 p-2 border">
                     </div>
                     <div class="md:col-span-2">
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Operating System</label>
-                        <select id="os_type" name="category" class="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 p-2 border bg-white" onchange="toggleFormFields()">
+                        <label class="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">Operating System</label>
+                        <select id="os_type" name="category" class="w-full rounded-md border-gray-300 dark:border-slate-600 dark:bg-slate-700 dark:text-white shadow-sm focus:border-blue-500 focus:ring-blue-500 p-2 border bg-white dark:bg-slate-700" onchange="toggleFormFields()">
                             <option value="">Select OS...</option>
                             <option value="iOS">iOS (iPhone)</option>
                             <option value="Android">Android</option>
@@ -35,74 +35,74 @@
 
             <!-- Technical Specs -->
             <div class="mb-8" id="tech_specs_section" style="display: none;">
-                <h4 class="text-sm uppercase tracking-wide text-gray-500 font-bold mb-4">Technical Specifications</h4>
+                <h4 class="text-sm uppercase tracking-wide text-gray-500 dark:text-slate-400 font-bold mb-4">Technical Specifications</h4>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div data-os="both">
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Processor Score (AnTuTu/Geekbench)</label>
-                        <input name="processor_score" type="number" class="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 p-2 border" placeholder="e.g. 500000">
+                        <label class="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">Processor Score (AnTuTu/Geekbench)</label>
+                        <input name="processor_score" type="number" class="w-full rounded-md border-gray-300 dark:border-slate-600 dark:bg-slate-700 dark:text-white shadow-sm focus:border-blue-500 focus:ring-blue-500 p-2 border" placeholder="e.g. 500000">
                     </div>
                     <div data-os="both">
-                        <label class="block text-sm font-medium text-gray-700 mb-1">RAM (GB)</label>
-                        <input name="ram_gb" type="number" class="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 p-2 border" placeholder="e.g. 8">
+                        <label class="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">RAM (GB)</label>
+                        <input name="ram_gb" type="number" class="w-full rounded-md border-gray-300 dark:border-slate-600 dark:bg-slate-700 dark:text-white shadow-sm focus:border-blue-500 focus:ring-blue-500 p-2 border" placeholder="e.g. 8">
                     </div>
                     <div data-os="both">
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Storage (GB)</label>
-                        <input name="storage_gb" type="number" class="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 p-2 border" placeholder="e.g. 128">
+                        <label class="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">Storage (GB)</label>
+                        <input name="storage_gb" type="number" class="w-full rounded-md border-gray-300 dark:border-slate-600 dark:bg-slate-700 dark:text-white shadow-sm focus:border-blue-500 focus:ring-blue-500 p-2 border" placeholder="e.g. 128">
                     </div>
                     <div data-os="both">
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Battery (mAh)</label>
-                        <input name="battery_mah" type="number" class="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 p-2 border" placeholder="e.g. 4500">
+                        <label class="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">Battery (mAh)</label>
+                        <input name="battery_mah" type="number" class="w-full rounded-md border-gray-300 dark:border-slate-600 dark:bg-slate-700 dark:text-white shadow-sm focus:border-blue-500 focus:ring-blue-500 p-2 border" placeholder="e.g. 4500">
                     </div>
                     <div data-os="both">
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Screen Size (Inches)</label>
-                        <input name="screen_inches" type="number" step="0.1" class="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 p-2 border" placeholder="e.g. 6.1">
+                        <label class="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">Screen Size (Inches)</label>
+                        <input name="screen_inches" type="number" step="0.1" class="w-full rounded-md border-gray-300 dark:border-slate-600 dark:bg-slate-700 dark:text-white shadow-sm focus:border-blue-500 focus:ring-blue-500 p-2 border" placeholder="e.g. 6.1">
                     </div>
                     <div data-os="both">
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Camera (MP)</label>
-                        <input name="camera_mp" type="number" class="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 p-2 border" placeholder="e.g. 50">
+                        <label class="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">Camera (MP)</label>
+                        <input name="camera_mp" type="number" class="w-full rounded-md border-gray-300 dark:border-slate-600 dark:bg-slate-700 dark:text-white shadow-sm focus:border-blue-500 focus:ring-blue-500 p-2 border" placeholder="e.g. 50">
                     </div>
                     <div data-os="both">
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Price (USD)</label>
-                        <input name="price_usd" type="number" step="0.01" class="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 p-2 border" placeholder="e.g. 499.00" required>
+                        <label class="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">Price (USD)</label>
+                        <input name="price_usd" type="number" step="0.01" class="w-full rounded-md border-gray-300 dark:border-slate-600 dark:bg-slate-700 dark:text-white shadow-sm focus:border-blue-500 focus:ring-blue-500 p-2 border" placeholder="e.g. 499.00" required>
                     </div>
                     <div data-os="both">
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Weight (grams)</label>
-                        <input name="weight_g" type="number" step="0.1" class="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 p-2 border" placeholder="e.g. 180">
+                        <label class="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">Weight (grams)</label>
+                        <input name="weight_g" type="number" step="0.1" class="w-full rounded-md border-gray-300 dark:border-slate-600 dark:bg-slate-700 dark:text-white shadow-sm focus:border-blue-500 focus:ring-blue-500 p-2 border" placeholder="e.g. 180">
                     </div>
                 </div>
             </div>
 
             <!-- Component Details -->
             <div class="mb-8" id="component_details_section" style="display: none;">
-                <h4 class="text-sm uppercase tracking-wide text-gray-500 font-bold mb-4">Component Details (Manufacturer & Model)</h4>
+                <h4 class="text-sm uppercase tracking-wide text-gray-500 dark:text-slate-400 font-bold mb-4">Component Details (Manufacturer & Model)</h4>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div data-os="both">
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Processor Model</label>
-                        <input name="processor_model" type="text" class="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 p-2 border" placeholder="e.g. Snapdragon 8 Gen 2">
+                        <label class="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">Processor Model</label>
+                        <input name="processor_model" type="text" class="w-full rounded-md border-gray-300 dark:border-slate-600 dark:bg-slate-700 dark:text-white shadow-sm focus:border-blue-500 focus:ring-blue-500 p-2 border" placeholder="e.g. Snapdragon 8 Gen 2">
                     </div>
                     <div data-os="both">
-                        <label class="block text-sm font-medium text-gray-700 mb-1">RAM Type</label>
-                        <input name="ram_type" type="text" class="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 p-2 border" placeholder="e.g. LPDDR5X">
+                        <label class="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">RAM Type</label>
+                        <input name="ram_type" type="text" class="w-full rounded-md border-gray-300 dark:border-slate-600 dark:bg-slate-700 dark:text-white shadow-sm focus:border-blue-500 focus:ring-blue-500 p-2 border" placeholder="e.g. LPDDR5X">
                     </div>
                     <div data-os="both">
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Storage Type</label>
-                        <input name="storage_type" type="text" class="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 p-2 border" placeholder="e.g. UFS 4.0">
+                        <label class="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">Storage Type</label>
+                        <input name="storage_type" type="text" class="w-full rounded-md border-gray-300 dark:border-slate-600 dark:bg-slate-700 dark:text-white shadow-sm focus:border-blue-500 focus:ring-blue-500 p-2 border" placeholder="e.g. UFS 4.0">
                     </div>
                     <div data-os="both">
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Main Camera Sensor</label>
-                        <input name="camera_sensor_main" type="text" class="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 p-2 border" placeholder="e.g. Sony IMX 906">
+                        <label class="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">Main Camera Sensor</label>
+                        <input name="camera_sensor_main" type="text" class="w-full rounded-md border-gray-300 dark:border-slate-600 dark:bg-slate-700 dark:text-white shadow-sm focus:border-blue-500 focus:ring-blue-500 p-2 border" placeholder="e.g. Sony IMX 906">
                     </div>
                     <div data-os="both">
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Ultra-wide Camera Sensor</label>
-                        <input name="camera_sensor_ultra" type="text" class="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 p-2 border" placeholder="e.g. Samsung ISOCELL JN1">
+                        <label class="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">Ultra-wide Camera Sensor</label>
+                        <input name="camera_sensor_ultra" type="text" class="w-full rounded-md border-gray-300 dark:border-slate-600 dark:bg-slate-700 dark:text-white shadow-sm focus:border-blue-500 focus:ring-blue-500 p-2 border" placeholder="e.g. Samsung ISOCELL JN1">
                     </div>
                     <div data-os="both">
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Telephoto Camera Sensor (optional)</label>
-                        <input name="camera_sensor_telephoto" type="text" class="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 p-2 border" placeholder="e.g. OmniVision OV50E">
+                        <label class="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">Telephoto Camera Sensor (optional)</label>
+                        <input name="camera_sensor_telephoto" type="text" class="w-full rounded-md border-gray-300 dark:border-slate-600 dark:bg-slate-700 dark:text-white shadow-sm focus:border-blue-500 focus:ring-blue-500 p-2 border" placeholder="e.g. OmniVision OV50E">
                     </div>
                     <div data-os="both">
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Battery Technology</label>
-                        <select name="battery_tech" class="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 p-2 border bg-white">
+                        <label class="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">Battery Technology</label>
+                        <select name="battery_tech" class="w-full rounded-md border-gray-300 dark:border-slate-600 dark:bg-slate-700 dark:text-white shadow-sm focus:border-blue-500 focus:ring-blue-500 p-2 border bg-white dark:bg-slate-700">
                             <option value="">Select battery type...</option>
                             <option value="Li-Po">Li-Po (Lithium Polymer)</option>
                             <option value="Li-Ion">Li-Ion (Lithium Ion)</option>
@@ -110,12 +110,12 @@
                         </select>
                     </div>
                     <div data-os="both">
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Charging Power (Watts)</label>
-                        <input name="charging_watt" type="number" step="0.1" class="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 p-2 border" placeholder="e.g. 45">
+                        <label class="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">Charging Power (Watts)</label>
+                        <input name="charging_watt" type="number" step="0.1" class="w-full rounded-md border-gray-300 dark:border-slate-600 dark:bg-slate-700 dark:text-white shadow-sm focus:border-blue-500 focus:ring-blue-500 p-2 border" placeholder="e.g. 45">
                     </div>
                     <div data-os="both">
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Display Type</label>
-                        <select name="display_type" class="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 p-2 border bg-white">
+                        <label class="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">Display Type</label>
+                        <select name="display_type" class="w-full rounded-md border-gray-300 dark:border-slate-600 dark:bg-slate-700 dark:text-white shadow-sm focus:border-blue-500 focus:ring-blue-500 p-2 border bg-white dark:bg-slate-700">
                             <option value="">Select display type...</option>
                             <option value="AMOLED">AMOLED</option>
                             <option value="OLED">OLED</option>
@@ -124,8 +124,8 @@
                         </select>
                     </div>
                     <div data-os="both">
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Display Refresh Rate (Hz)</label>
-                        <select name="refresh_rate_hz" class="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 p-2 border bg-white">
+                        <label class="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">Display Refresh Rate (Hz)</label>
+                        <select name="refresh_rate_hz" class="w-full rounded-md border-gray-300 dark:border-slate-600 dark:bg-slate-700 dark:text-white shadow-sm focus:border-blue-500 focus:ring-blue-500 p-2 border bg-white dark:bg-slate-700">
                             <option value="">Select refresh rate...</option>
                             <option value="60">60 Hz</option>
                             <option value="90">90 Hz</option>
@@ -139,65 +139,79 @@
 
             <!-- Redirect Links Section -->
             <div class="glass-panel p-6">
-                <h3 class="text-lg font-semibold text-gray-800 mb-4 flex items-center">
-                    <svg class="w-5 h-5 mr-2 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <h3 class="text-lg font-semibold text-gray-800 dark:text-white mb-4 flex items-center">
+                    <svg class="w-5 h-5 mr-2 text-green-600 dark:text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"/>
                     </svg>
                     Where to Buy (Redirect Links)
                 </h3>
-                <p class="text-sm text-gray-500 mb-4">Add links where customers can purchase this product</p>
+                <p class="text-sm text-gray-500 dark:text-slate-400 mb-4">Add links where customers can purchase this product</p>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">
+                        <label class="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">
                             <span class="flex items-center">
                                 <span class="text-orange-500 mr-1">🛒</span> Amazon Link
                             </span>
                         </label>
-                        <input name="link_amazon" type="url" class="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 p-2 border" placeholder="https://www.amazon.com/...">
+                        <input name="link_amazon" type="url" class="w-full rounded-md border-gray-300 dark:border-slate-600 dark:bg-slate-700 dark:text-white shadow-sm focus:border-blue-500 focus:ring-blue-500 p-2 border" placeholder="https://www.amazon.com/...">
                     </div>
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">
+                        <label class="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">
                             <span class="flex items-center">
                                 <span class="text-yellow-500 mr-1">🛍️</span> Flipkart Link
                             </span>
                         </label>
-                        <input name="link_flipkart" type="url" class="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 p-2 border" placeholder="https://www.flipkart.com/...">
+                        <input name="link_flipkart" type="url" class="w-full rounded-md border-gray-300 dark:border-slate-600 dark:bg-slate-700 dark:text-white shadow-sm focus:border-blue-500 focus:ring-blue-500 p-2 border" placeholder="https://www.flipkart.com/...">
                     </div>
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">
+                        <label class="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">
                             <span class="flex items-center">
                                 <span class="text-blue-500 mr-1">🏢</span> Official Store Link
                             </span>
                         </label>
-                        <input name="link_official" type="url" class="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 p-2 border" placeholder="https://www.apple.com/...">
+                        <input name="link_official" type="url" class="w-full rounded-md border-gray-300 dark:border-slate-600 dark:bg-slate-700 dark:text-white shadow-sm focus:border-blue-500 focus:ring-blue-500 p-2 border" placeholder="https://www.apple.com/...">
                     </div>
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">
+                        <label class="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">
                             <span class="flex items-center">
-                                <span class="text-gray-500 mr-1">🔗</span> Other Link
+                                <span class="text-gray-500 dark:text-slate-400 mr-1">🔗</span> Other Link
                             </span>
                         </label>
-                        <input name="link_other" type="url" class="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 p-2 border" placeholder="https://...">
+                        <input name="link_other" type="url" class="w-full rounded-md border-gray-300 dark:border-slate-600 dark:bg-slate-700 dark:text-white shadow-sm focus:border-blue-500 focus:ring-blue-500 p-2 border" placeholder="https://...">
                     </div>
                 </div>
             </div>
 
             <!-- Seller Verification Section -->
-            <div class="glass-panel p-6 mt-6 border-2 border-purple-200 bg-purple-50">
-                <h3 class="text-lg font-semibold text-gray-800 mb-4 flex items-center">
-                    <svg class="w-5 h-5 mr-2 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div class="glass-panel p-6 mt-6 border-2 border-purple-200 dark:border-purple-800 bg-purple-50 dark:bg-purple-900/30">
+                <h3 class="text-lg font-semibold text-gray-800 dark:text-white mb-4 flex items-center">
+                    <svg class="w-5 h-5 mr-2 text-purple-600 dark:text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
                     </svg>
                     Seller Verification (Required)
                 </h3>
-                <div class="bg-white rounded-lg p-4 mb-4">
-                    <p class="text-sm text-gray-600 mb-3">
+                <div class="bg-white dark:bg-slate-800 rounded-lg p-4 mb-4">
+                    <p class="text-sm text-gray-600 dark:text-slate-300 mb-3">
                         <strong>Upload your Authorized Dealer/Reseller Certificate</strong> from the manufacturer 
                         (Apple, Samsung, etc.) to verify your products are authentic.
                     </p>
-                    <ul class="text-xs text-gray-500 space-y-1 mb-4">
+                    <ul class="text-xs text-gray-500 dark:text-slate-400 space-y-1 mb-4">
                         <li>✓ Document should have brand/manufacturer logo</li>
                         <li>✓ Should contain words like "Authorized Dealer" or "Official Reseller"</li>
+                        <li>✓ Must show your company name: <strong class="dark:text-white">{{ current_user.company_name }}</strong></li>
+                        <li>✓ Should have validity dates and official signature/stamp</li>
+                    </ul>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-2">Upload Certificate (PDF, JPG, PNG)</label>
+                        <input type="file" name="verification_doc" accept=".pdf,.jpg,.jpeg,.png" 
+                               class="w-full p-2 border border-gray-300 dark:border-slate-600 rounded-lg text-sm dark:text-slate-300 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:bg-purple-100 file:text-purple-700 dark:file:bg-purple-900 dark:file:text-purple-300 hover:file:bg-purple-200 dark:hover:file:bg-purple-800" required>
+                    </div>
+                </div>
+                <p class="text-xs text-gray-500 dark:text-slate-400">
+                    📌 Your document will be screened by AI first. If it passes, a verifier will review and approve it.
+                    Products won't show "Verified Seller" badge until approved.
+                </p>
+            </div></li>
                         <li>✓ Must show your company name: <strong>{{ current_user.company_name }}</strong></li>
                         <li>✓ Should have validity dates and official signature/stamp</li>
                     </ul>

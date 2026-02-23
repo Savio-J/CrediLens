@@ -4,10 +4,10 @@
     <!-- Header -->
     <div class="flex items-center justify-between mb-6">
         <div>
-            <h1 class="text-2xl font-bold text-gray-900">🔍 Review Document</h1>
-            <p class="text-gray-600 mt-1">{{ product.product_name }}</p>
+            <h1 class="text-2xl font-bold text-gray-900 dark:text-white">🔍 Review Document</h1>
+            <p class="text-gray-600 dark:text-slate-400 mt-1">{{ product.product_name }}</p>
         </div>
-        <a href="{{ url_for('verifier_dashboard') }}" class="text-blue-600 hover:text-blue-800">
+        <a href="{{ url_for('verifier_dashboard') }}" class="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300">
             ← Back to Dashboard
         </a>
     </div>
@@ -15,18 +15,18 @@
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <!-- Document View -->
         <div class="glass-panel p-6">
-            <h2 class="text-lg font-bold text-gray-900 mb-4">📄 Uploaded Document</h2>
+            <h2 class="text-lg font-bold text-gray-900 dark:text-white mb-4">📄 Uploaded Document</h2>
             
             {% if product.verification_doc %}
-            <div class="border border-gray-200 rounded-lg overflow-hidden">
+            <div class="border border-gray-200 dark:border-slate-700 rounded-lg overflow-hidden">
                 {% if product.verification_doc_type in ['jpg', 'jpeg', 'png'] %}
                 <img src="{{ url_for('verifier_view_document', product_id=product.id) }}" 
                      alt="Verification Document" 
                      class="w-full h-auto">
                 {% else %}
-                <div class="p-8 text-center bg-gray-50">
+                <div class="p-8 text-center bg-gray-50 dark:bg-slate-800">
                     <div class="text-4xl mb-2">📑</div>
-                    <p class="text-gray-600 mb-4">PDF Document</p>
+                    <p class="text-gray-600 dark:text-slate-400 mb-4">PDF Document</p>
                     <a href="{{ url_for('verifier_view_document', product_id=product.id) }}" 
                        target="_blank"
                        class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-lg inline-block">
@@ -36,7 +36,7 @@
                 {% endif %}
             </div>
             {% else %}
-            <p class="text-gray-500">No document uploaded.</p>
+            <p class="text-gray-500 dark:text-slate-400">No document uploaded.</p>
             {% endif %}
         </div>
 
@@ -44,40 +44,40 @@
         <div class="space-y-6">
             <!-- Product Info -->
             <div class="glass-panel p-6">
-                <h2 class="text-lg font-bold text-gray-900 mb-4">📱 Product Information</h2>
+                <h2 class="text-lg font-bold text-gray-900 dark:text-white mb-4">📱 Product Information</h2>
                 <div class="space-y-3 text-sm">
                     <div class="flex justify-between">
-                        <span class="text-gray-500">Product Name:</span>
-                        <span class="font-medium">{{ product.product_name }}</span>
+                        <span class="text-gray-500 dark:text-slate-400">Product Name:</span>
+                        <span class="font-medium dark:text-white">{{ product.product_name }}</span>
                     </div>
                     <div class="flex justify-between">
-                        <span class="text-gray-500">Company:</span>
-                        <span class="font-medium">{{ product.company_name }}</span>
+                        <span class="text-gray-500 dark:text-slate-400">Company:</span>
+                        <span class="font-medium dark:text-white">{{ product.company_name }}</span>
                     </div>
                     <div class="flex justify-between">
-                        <span class="text-gray-500">Category:</span>
-                        <span class="font-medium">{{ product.category or 'Smartphone' }}</span>
+                        <span class="text-gray-500 dark:text-slate-400">Category:</span>
+                        <span class="font-medium dark:text-white">{{ product.category or 'Smartphone' }}</span>
                     </div>
                     <div class="flex justify-between">
-                        <span class="text-gray-500">Price:</span>
-                        <span class="font-medium">${{ "%.2f"|format(product.price_usd or 0) }}</span>
+                        <span class="text-gray-500 dark:text-slate-400">Price:</span>
+                        <span class="font-medium dark:text-white">${{ "%.2f"|format(product.price_usd or 0) }}</span>
                     </div>
                 </div>
             </div>
 
             <!-- AI Screening Results -->
             <div class="glass-panel p-6">
-                <h2 class="text-lg font-bold text-gray-900 mb-4">🤖 AI Screening Results</h2>
+                <h2 class="text-lg font-bold text-gray-900 dark:text-white mb-4">🤖 AI Screening Results</h2>
                 
                 {% if ml_result %}
                 <div class="mb-4">
                     <div class="flex items-center justify-between mb-2">
-                        <span class="text-sm font-medium text-gray-700">Score:</span>
-                        <span class="text-lg font-bold {% if ml_result.score >= 4 %}text-green-600{% else %}text-red-600{% endif %}">
+                        <span class="text-sm font-medium text-gray-700 dark:text-slate-300">Score:</span>
+                        <span class="text-lg font-bold {% if ml_result.score >= 4 %}text-green-600 dark:text-green-400{% else %}text-red-600 dark:text-red-400{% endif %}">
                             {{ ml_result.score }}/6
                         </span>
                     </div>
-                    <div class="h-2 bg-gray-200 rounded-full overflow-hidden">
+                    <div class="h-2 bg-gray-200 dark:bg-slate-700 rounded-full overflow-hidden">
                         <div class="h-full {% if ml_result.score >= 4 %}bg-green-500{% else %}bg-red-500{% endif %} rounded-full" 
                              style="width: {{ (ml_result.score / 6 * 100)|int }}%"></div>
                     </div>
@@ -87,10 +87,10 @@
                 <div class="space-y-2 mb-4">
                     {% for check, passed in ml_result.checks.items() %}
                     <div class="flex items-center text-sm">
-                        <span class="w-5 h-5 flex items-center justify-center mr-2 {% if passed %}text-green-500{% else %}text-red-400{% endif %}">
+                        <span class="w-5 h-5 flex items-center justify-center mr-2 {% if passed %}text-green-500 dark:text-green-400{% else %}text-red-400{% endif %}">
                             {% if passed %}✓{% else %}✗{% endif %}
                         </span>
-                        <span class="{% if passed %}text-gray-700{% else %}text-gray-400{% endif %}">
+                        <span class="{% if passed %}text-gray-700 dark:text-slate-300{% else %}text-gray-400 dark:text-slate-500{% endif %}">
                             {{ check.replace('_', ' ').title() }}
                         </span>
                     </div>
@@ -99,31 +99,31 @@
                 {% endif %}
 
                 {% if ml_result.extracted_info %}
-                <div class="bg-gray-50 rounded-lg p-3 text-sm">
-                    <p class="font-medium text-gray-700 mb-1">Extracted Info:</p>
+                <div class="bg-gray-50 dark:bg-slate-800 rounded-lg p-3 text-sm">
+                    <p class="font-medium text-gray-700 dark:text-slate-300 mb-1">Extracted Info:</p>
                     {% if ml_result.extracted_info.issuing_brand %}
-                    <p class="text-gray-600">Brand: {{ ml_result.extracted_info.issuing_brand }}</p>
+                    <p class="text-gray-600 dark:text-slate-400">Brand: {{ ml_result.extracted_info.issuing_brand }}</p>
                     {% endif %}
                     {% if ml_result.extracted_info.company_mentioned %}
-                    <p class="text-gray-600">Company: {{ ml_result.extracted_info.company_mentioned }}</p>
+                    <p class="text-gray-600 dark:text-slate-400">Company: {{ ml_result.extracted_info.company_mentioned }}</p>
                     {% endif %}
                     {% if ml_result.extracted_info.valid_until %}
-                    <p class="text-gray-600">Valid Until: {{ ml_result.extracted_info.valid_until }}</p>
+                    <p class="text-gray-600 dark:text-slate-400">Valid Until: {{ ml_result.extracted_info.valid_until }}</p>
                     {% endif %}
                 </div>
                 {% endif %}
 
                 {% if ml_result.reason %}
-                <p class="text-xs text-gray-500 mt-3">{{ ml_result.reason }}</p>
+                <p class="text-xs text-gray-500 dark:text-slate-400 mt-3">{{ ml_result.reason }}</p>
                 {% endif %}
                 {% else %}
-                <p class="text-gray-500">No AI screening data available.</p>
+                <p class="text-gray-500 dark:text-slate-400">No AI screening data available.</p>
                 {% endif %}
             </div>
 
             <!-- Action Buttons -->
             <div class="glass-panel p-6">
-                <h2 class="text-lg font-bold text-gray-900 mb-4">⚡ Action</h2>
+                <h2 class="text-lg font-bold text-gray-900 dark:text-white mb-4">⚡ Action</h2>
                 
                 <form action="{{ url_for('verifier_approve', product_id=product.id) }}" method="POST" class="mb-3">
                     <input type="hidden" name="notes" value="Verified and approved">
@@ -134,8 +134,8 @@
                 
                 <form action="{{ url_for('verifier_reject', product_id=product.id) }}" method="POST" id="rejectForm">
                     <div class="mb-3">
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Rejection Reason</label>
-                        <select name="reason" class="w-full p-2 border border-gray-300 rounded-lg text-sm" required>
+                        <label class="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">Rejection Reason</label>
+                        <select name="reason" class="w-full p-2 border border-gray-300 dark:border-slate-600 dark:bg-slate-700 dark:text-white rounded-lg text-sm" required>
                             <option value="">Select a reason...</option>
                             <option value="Document is not an authorization certificate">Not an authorization certificate</option>
                             <option value="Company name does not match">Company name mismatch</option>

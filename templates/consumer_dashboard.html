@@ -1,29 +1,29 @@
 {% extends "base.html" %}
 {% block content %}
 <!-- Consumer Secondary Navbar -->
-<div class="bg-white border-b border-gray-200 -mt-6 mb-6 -mx-4 px-4 sm:-mx-6 sm:px-6 lg:-mx-8 lg:px-8">
+<div class="bg-white dark:bg-slate-800 border-b border-gray-200 dark:border-slate-700 -mt-6 mb-6 -mx-4 px-4 sm:-mx-6 sm:px-6 lg:-mx-8 lg:px-8">
     <div class="max-w-6xl mx-auto">
         <div class="flex items-center justify-between py-3">
             <div class="flex items-center space-x-1 overflow-x-auto">
-                <a href="/consumer" class="px-4 py-2 text-sm font-medium text-blue-600 bg-blue-50 rounded-lg whitespace-nowrap">
+                <a href="/consumer" class="px-4 py-2 text-sm font-medium text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/30 rounded-lg whitespace-nowrap">
                     📱 Products
                 </a>
-                <a href="/consumer/compare" class="px-4 py-2 text-sm font-medium text-gray-600 hover:text-blue-600 hover:bg-gray-50 rounded-lg transition whitespace-nowrap">
+                <a href="/consumer/compare" class="px-4 py-2 text-sm font-medium text-gray-600 dark:text-slate-300 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-gray-50 dark:hover:bg-slate-700 rounded-lg transition whitespace-nowrap">
                     📊 Compare
                 </a>
-                <a href="/consumer/custom-scores" class="px-4 py-2 text-sm font-medium text-gray-600 hover:text-blue-600 hover:bg-gray-50 rounded-lg transition whitespace-nowrap">
+                <a href="/consumer/custom-scores" class="px-4 py-2 text-sm font-medium text-gray-600 dark:text-slate-300 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-gray-50 dark:hover:bg-slate-700 rounded-lg transition whitespace-nowrap">
                     ⚙️ Custom Score
                 </a>
-                <a href="/chatbot" class="px-4 py-2 text-sm font-medium text-gray-600 hover:text-blue-600 hover:bg-gray-50 rounded-lg transition whitespace-nowrap">
+                <a href="/chatbot" class="px-4 py-2 text-sm font-medium text-gray-600 dark:text-slate-300 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-gray-50 dark:hover:bg-slate-700 rounded-lg transition whitespace-nowrap">
                     🤖 AI Chat
                 </a>
-                <a href="/consumer/ai-scan" class="px-4 py-2 text-sm font-medium text-gray-600 hover:text-blue-600 hover:bg-gray-50 rounded-lg transition whitespace-nowrap">
+                <a href="/consumer/ai-scan" class="px-4 py-2 text-sm font-medium text-gray-600 dark:text-slate-300 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-gray-50 dark:hover:bg-slate-700 rounded-lg transition whitespace-nowrap">
                     📷 AI Scan
                 </a>
-                <a href="/consumer/scan" class="px-4 py-2 text-sm font-medium text-gray-600 hover:text-blue-600 hover:bg-gray-50 rounded-lg transition whitespace-nowrap">
+                <a href="/consumer/scan" class="px-4 py-2 text-sm font-medium text-gray-600 dark:text-slate-300 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-gray-50 dark:hover:bg-slate-700 rounded-lg transition whitespace-nowrap">
                     📲 QR Scan
                 </a>
-                <a href="/consumer/my-alerts" class="px-4 py-2 text-sm font-medium text-gray-600 hover:text-blue-600 hover:bg-gray-50 rounded-lg transition whitespace-nowrap">
+                <a href="/consumer/my-alerts" class="px-4 py-2 text-sm font-medium text-gray-600 dark:text-slate-300 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-gray-50 dark:hover:bg-slate-700 rounded-lg transition whitespace-nowrap">
                     🔔 Alerts
                 </a>
             </div>
@@ -35,20 +35,20 @@
     <!-- Header -->
     <div class="mb-6">
         <div class="mb-4">
-            <h2 class="text-3xl font-bold text-gray-900">Consumer Portal</h2>
-            <p class="text-gray-500">Find out how good that phone <i>really</i> is.</p>
+            <h2 class="text-3xl font-bold text-gray-900 dark:text-white">Consumer Portal</h2>
+            <p class="text-gray-500 dark:text-slate-400">Find out how good that phone <i>really</i> is.</p>
         </div>
         
         <!-- Search Bar -->
         <div class="relative">
             <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                <svg class="w-5 h-5 text-gray-400 dark:text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
             </div>
             <input 
                 type="text" 
                 id="searchInput"
                 placeholder="Search by product name, company, or specs..." 
-                class="w-full pl-12 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 shadow-sm"
+                class="w-full pl-12 pr-4 py-3 border border-gray-300 dark:border-slate-600 dark:bg-slate-700 dark:text-white dark:placeholder-slate-400 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 shadow-sm"
                 onkeyup="filterProducts()"
             >
         </div>
@@ -61,12 +61,12 @@
             <!-- Score Badge -->
             <div class="flex justify-between items-start mb-4">
                 <div class="flex-1">
-                    <h3 class="font-bold text-lg text-gray-900 mb-1">{{ product.product_name }}</h3>
-                    <p class="text-sm text-gray-500">{{ product.company_name }}</p>
+                    <h3 class="font-bold text-lg text-gray-900 dark:text-white mb-1">{{ product.product_name }}</h3>
+                    <p class="text-sm text-gray-500 dark:text-slate-400">{{ product.company_name }}</p>
                     
                     <!-- Blockchain Badge -->
                     {% if product.blockchain_tx %}
-                    <span class="inline-flex items-center mt-2 px-3 py-1 bg-green-100 text-green-700 text-sm font-semibold rounded-full">
+                    <span class="inline-flex items-center mt-2 px-3 py-1 bg-green-100 dark:bg-green-900/40 text-green-700 dark:text-green-300 text-sm font-semibold rounded-full">
                         <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path></svg>
                         Verified
                     </span>
@@ -74,7 +74,7 @@
                     
                     <!-- Verified Seller Badge -->
                     {% if product.verification_status == 'approved' %}
-                    <span class="inline-flex items-center mt-2 {% if product.blockchain_tx %}ml-2{% endif %} px-3 py-1 bg-purple-100 text-purple-700 text-sm font-semibold rounded-full">
+                    <span class="inline-flex items-center mt-2 {% if product.blockchain_tx %}ml-2{% endif %} px-3 py-1 bg-purple-100 dark:bg-purple-900/40 text-purple-700 dark:text-purple-300 text-sm font-semibold rounded-full">
                         <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
                         Verified Seller
                     </span>
@@ -88,24 +88,24 @@
                             {% if product.average_user_rating % 1 >= 0.5 %}½{% endif %}
                             {% for i in range(5 - (product.average_user_rating|int) - (1 if product.average_user_rating % 1 >= 0.5 else 0)) %}☆{% endfor %}
                         </div>
-                        <span class="text-xs text-gray-500">{{ product.average_user_rating }} ({{ product.reviews|length }})</span>
+                        <span class="text-xs text-gray-500 dark:text-slate-400">{{ product.average_user_rating }} ({{ product.reviews|length }})</span>
                     </div>
                     {% endif %}
                 </div>
                 <div class="ml-4">
                     {% if product.ideal_score >= 80 %}
-                    <div class="bg-green-100 text-green-800 px-3 py-2 rounded-lg font-bold text-xl">{{ "%.1f"|format(product.ideal_score) }}</div>
+                    <div class="bg-green-100 dark:bg-green-900/40 text-green-800 dark:text-green-300 px-3 py-2 rounded-lg font-bold text-xl">{{ "%.1f"|format(product.ideal_score) }}</div>
                     {% elif product.ideal_score >= 60 %}
-                    <div class="bg-yellow-100 text-yellow-800 px-3 py-2 rounded-lg font-bold text-xl">{{ "%.1f"|format(product.ideal_score) }}</div>
+                    <div class="bg-yellow-100 dark:bg-yellow-900/40 text-yellow-800 dark:text-yellow-300 px-3 py-2 rounded-lg font-bold text-xl">{{ "%.1f"|format(product.ideal_score) }}</div>
                     {% else %}
-                    <div class="bg-red-100 text-red-800 px-3 py-2 rounded-lg font-bold text-xl">{{ "%.1f"|format(product.ideal_score) }}</div>
+                    <div class="bg-red-100 dark:bg-red-900/40 text-red-800 dark:text-red-300 px-3 py-2 rounded-lg font-bold text-xl">{{ "%.1f"|format(product.ideal_score) }}</div>
                     {% endif %}
-                    <div class="text-xs text-gray-500 text-center mt-1">Cred Score</div>
+                    <div class="text-xs text-gray-500 dark:text-slate-400 text-center mt-1">Cred Score</div>
                 </div>
             </div>
 
             <!-- Quick Specs -->
-            <div class="space-y-2 text-sm text-gray-600">
+            <div class="space-y-2 text-sm text-gray-600 dark:text-slate-300">
                 {% if product.processor_score %}
                 <div class="flex justify-between">
                     <span>Processor:</span>
@@ -127,14 +127,14 @@
                 {% if product.price_usd %}
                 <div class="flex justify-between">
                     <span>Price:</span>
-                    <span class="font-medium text-blue-600">${{ product.price_usd }}</span>
+                    <span class="font-medium text-blue-600 dark:text-blue-400">${{ product.price_usd }}</span>
                 </div>
                 {% endif %}
             </div>
 
             <!-- View Details Link -->
-            <div class="mt-4 pt-4 border-t border-gray-200 text-center">
-                <span class="text-blue-600 font-medium text-sm flex items-center justify-center">
+            <div class="mt-4 pt-4 border-t border-gray-200 dark:border-slate-600 text-center">
+                <span class="text-blue-600 dark:text-blue-400 font-medium text-sm flex items-center justify-center">
                     View Details
                     <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
                 </span>
@@ -145,17 +145,17 @@
 
     {% if not products %}
     <div class="glass-panel p-12 text-center">
-        <svg class="w-16 h-16 text-gray-300 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"></path></svg>
-        <h3 class="text-xl font-bold text-gray-700 mb-2">No Products Found</h3>
-        <p class="text-gray-500">Check back later or contact producers to register products.</p>
+        <svg class="w-16 h-16 text-gray-300 dark:text-slate-600 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"></path></svg>
+        <h3 class="text-xl font-bold text-gray-700 dark:text-slate-200 mb-2">No Products Found</h3>
+        <p class="text-gray-500 dark:text-slate-400">Check back later or contact producers to register products.</p>
     </div>
     {% endif %}
 
     <!-- No Results Message (hidden by default) -->
     <div id="noResultsMessage" class="glass-panel p-12 text-center hidden">
-        <svg class="w-16 h-16 text-gray-300 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
-        <h3 class="text-xl font-bold text-gray-700 mb-2">No Results Found</h3>
-        <p class="text-gray-500">Try adjusting your search terms.</p>
+        <svg class="w-16 h-16 text-gray-300 dark:text-slate-600 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+        <h3 class="text-xl font-bold text-gray-700 dark:text-slate-200 mb-2">No Results Found</h3>
+        <p class="text-gray-500 dark:text-slate-400">Try adjusting your search terms.</p>
     </div>
 </div>
 

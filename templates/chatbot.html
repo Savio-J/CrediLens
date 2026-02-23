@@ -3,43 +3,43 @@
 <div class="max-w-4xl mx-auto px-4 py-6">
     <!-- Header -->
     <div class="text-center mb-6">
-        <h1 class="text-3xl font-bold text-gray-900 flex items-center justify-center">
+        <h1 class="text-3xl font-bold text-gray-900 dark:text-white flex items-center justify-center">
             <span class="text-4xl mr-3">🤖</span>
             CrediBot
         </h1>
-        <p class="text-gray-600 mt-2">Your AI assistant for smartphone questions</p>
+        <p class="text-gray-600 dark:text-slate-400 mt-2">Your AI assistant for smartphone questions</p>
     </div>
 
     <!-- Chat Container -->
     <div class="glass-panel overflow-hidden">
         <!-- Messages Area -->
-        <div id="chatMessages" class="h-96 overflow-y-auto p-4 space-y-4 bg-gray-50">
+        <div id="chatMessages" class="h-96 overflow-y-auto p-4 space-y-4 bg-gray-50 dark:bg-slate-800/50">
             <!-- Welcome Message -->
             <div class="flex items-start">
                 <div class="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center text-white text-sm font-bold mr-3 flex-shrink-0">
                     🤖
                 </div>
-                <div class="bg-white rounded-lg p-3 shadow-sm max-w-[80%]">
-                    <p class="text-gray-800">Hi! I'm CrediBot, your smartphone expert. I can help you with:</p>
-                    <ul class="text-gray-600 text-sm mt-2 space-y-1">
+                <div class="bg-white dark:bg-slate-700 rounded-lg p-3 shadow-sm max-w-[80%]">
+                    <p class="text-gray-800 dark:text-slate-200">Hi! I'm CrediBot, your smartphone expert. I can help you with:</p>
+                    <ul class="text-gray-600 dark:text-slate-300 text-sm mt-2 space-y-1">
                         <li>📱 Finding phones with specific specs</li>
                         <li>💰 Budget recommendations</li>
                         <li>📊 Understanding credibility scores</li>
                         <li>🔄 Comparing different models</li>
                     </ul>
-                    <p class="text-gray-800 mt-2">What would you like to know?</p>
+                    <p class="text-gray-800 dark:text-slate-200 mt-2">What would you like to know?</p>
                 </div>
             </div>
         </div>
 
         <!-- Input Area -->
-        <div class="p-4 bg-white border-t border-gray-200">
+        <div class="p-4 bg-white dark:bg-slate-800 border-t border-gray-200 dark:border-slate-700">
             <form id="chatForm" class="flex gap-3">
                 <input 
                     type="text" 
                     id="userInput" 
                     placeholder="Ask me about phones..." 
-                    class="flex-1 rounded-lg border border-gray-300 px-4 py-3 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    class="flex-1 rounded-lg border border-gray-300 dark:border-slate-600 dark:bg-slate-700 dark:text-white dark:placeholder-slate-400 px-4 py-3 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                     autocomplete="off"
                 >
                 <button 
@@ -57,18 +57,18 @@
 
     <!-- Quick Questions -->
     <div class="mt-6">
-        <p class="text-sm text-gray-500 mb-3">Quick questions:</p>
+        <p class="text-sm text-gray-500 dark:text-slate-400 mb-3">Quick questions:</p>
         <div class="flex flex-wrap gap-2">
-            <button onclick="askQuestion('What is the best phone under $500?')" class="px-3 py-1.5 bg-gray-100 hover:bg-gray-200 rounded-full text-sm text-gray-700 transition">
+            <button onclick="askQuestion('What is the best phone under $500?')" class="px-3 py-1.5 bg-gray-100 dark:bg-slate-700 hover:bg-gray-200 dark:hover:bg-slate-600 rounded-full text-sm text-gray-700 dark:text-slate-300 transition">
                 Best phone under $500?
             </button>
-            <button onclick="askQuestion('Which phone has the best camera?')" class="px-3 py-1.5 bg-gray-100 hover:bg-gray-200 rounded-full text-sm text-gray-700 transition">
+            <button onclick="askQuestion('Which phone has the best camera?')" class="px-3 py-1.5 bg-gray-100 dark:bg-slate-700 hover:bg-gray-200 dark:hover:bg-slate-600 rounded-full text-sm text-gray-700 dark:text-slate-300 transition">
                 Best camera phone?
             </button>
-            <button onclick="askQuestion('How is the credibility score calculated?')" class="px-3 py-1.5 bg-gray-100 hover:bg-gray-200 rounded-full text-sm text-gray-700 transition">
+            <button onclick="askQuestion('How is the credibility score calculated?')" class="px-3 py-1.5 bg-gray-100 dark:bg-slate-700 hover:bg-gray-200 dark:hover:bg-slate-600 rounded-full text-sm text-gray-700 dark:text-slate-300 transition">
                 How is score calculated?
             </button>
-            <button onclick="askQuestion('Compare iPhone 16 Pro and Samsung S24 Ultra')" class="px-3 py-1.5 bg-gray-100 hover:bg-gray-200 rounded-full text-sm text-gray-700 transition">
+            <button onclick="askQuestion('Compare iPhone 16 Pro and Samsung S24 Ultra')" class="px-3 py-1.5 bg-gray-100 dark:bg-slate-700 hover:bg-gray-200 dark:hover:bg-slate-600 rounded-full text-sm text-gray-700 dark:text-slate-300 transition">
                 iPhone vs Samsung
             </button>
         </div>
@@ -96,8 +96,8 @@ function addMessage(content, isUser) {
             <div class="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center text-white text-sm font-bold mr-3 flex-shrink-0">
                 🤖
             </div>
-            <div class="bg-white rounded-lg p-3 shadow-sm max-w-[80%]">
-                <p class="text-gray-800 whitespace-pre-wrap">${escapeHtml(content)}</p>
+            <div class="bg-white dark:bg-slate-700 rounded-lg p-3 shadow-sm max-w-[80%]">
+                <p class="text-gray-800 dark:text-slate-200 whitespace-pre-wrap">${escapeHtml(content)}</p>
             </div>
         `;
     }
@@ -114,11 +114,11 @@ function addTypingIndicator() {
         <div class="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center text-white text-sm font-bold mr-3 flex-shrink-0">
             🤖
         </div>
-        <div class="bg-white rounded-lg p-3 shadow-sm">
+        <div class="bg-white dark:bg-slate-700 rounded-lg p-3 shadow-sm">
             <div class="flex space-x-1">
-                <div class="w-2 h-2 bg-gray-400 rounded-full animate-bounce"></div>
-                <div class="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style="animation-delay: 0.1s"></div>
-                <div class="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style="animation-delay: 0.2s"></div>
+                <div class="w-2 h-2 bg-gray-400 dark:bg-slate-500 rounded-full animate-bounce"></div>
+                <div class="w-2 h-2 bg-gray-400 dark:bg-slate-500 rounded-full animate-bounce" style="animation-delay: 0.1s"></div>
+                <div class="w-2 h-2 bg-gray-400 dark:bg-slate-500 rounded-full animate-bounce" style="animation-delay: 0.2s"></div>
             </div>
         </div>
     `;
