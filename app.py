@@ -949,16 +949,23 @@ To manage your alerts, visit CrediLens and go to "My Alerts".
             server.login(sender_email, sender_password)
             server.sendmail(sender_email, recipient_email, msg.as_string())
         
-        print(f"[Alert Email] Sent to {recipient_email} for {product_name}")
+        print(f"[Alert Email] SUCCESS - Sent to {recipient_email} for {product_name}")
         return True
         
+    except smtplib.SMTPAuthenticationError as e:
+        print(f"[Alert Email] SMTP AUTH ERROR - Check EMAIL_SENDER and EMAIL_PASSWORD: {str(e)}")
+        return False
+    except smtplib.SMTPException as e:
+        print(f"[Alert Email] SMTP ERROR - {str(e)}")
+        return False
     except Exception as e:
-        print(f"[Alert Email] Failed to send to {recipient_email}: {str(e)}")
+        print(f"[Alert Email] FAILED to send to {recipient_email}: {type(e).__name__}: {str(e)}")
         return False
 
 
 def send_alert_email_async(recipient_email, product_name, old_price, new_price, target_price, product_url):
     """Send email in background thread to not block the request."""
+    print(f"[Alert Email] Queueing email to {recipient_email} for {product_name}")
     thread = threading.Thread(
         target=send_alert_email,
         args=(recipient_email, product_name, old_price, new_price, target_price, product_url)
@@ -2235,6 +2242,51 @@ def verify_blockchain_score(product_id):
 
 
 # ==========================================
+# TEST EMAIL ROUTE (for debugging email configuration)
+# ==========================================
+@app.route('/admin/test-email')
+def test_email():
+    """
+    Test email configuration.
+    Usage: /admin/test-email?key=YOUR_SECRET_KEY&to=recipient@email.com
+    """
+    seed_key = os.environ.get('SEED_KEY', 'credilens-seed-2025')
+    provided_key = request.args.get('key', '')
+    
+    if provided_key != seed_key:
+        return jsonify({"error": "Unauthorized"}), 401
+    
+    recipient = request.args.get('to', '')
+    if not recipient or '@' not in recipient:
+        return jsonify({"error": "Provide ?to=email@example.com parameter"}), 400
+    
+    # Check config
+    sender = os.environ.get('EMAIL_SENDER')
+    password = os.environ.get('EMAIL_PASSWORD')
+    
+    if not sender or not password:
+        return jsonify({
+            "error": "Email not configured",
+            "EMAIL_SENDER": "SET" if sender else "MISSING",
+            "EMAIL_PASSWORD": "SET" if password else "MISSING"
+        }), 500
+    
+    # Send test email (synchronously so we see result)
+    result = send_alert_email(
+        recipient_email=recipient,
+        product_name="Test Product",
+        old_price=999.99,
+        new_price=799.99,
+        target_price=850.00,
+        product_url="https://credilens.onrender.com"
+    )
+    
+    if result:
+        return jsonify({"success": True, "message": f"Test email sent to {recipient}"})
+    else:
+        return jsonify({"success": False, "message": "Failed to send email - check server logs"}), 500
+
+
 # DATABASE SEED ROUTE (for PostgreSQL on Render)
 # ==========================================
 @app.route('/admin/seed-database', methods=['GET', 'POST'])
