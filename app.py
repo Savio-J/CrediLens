@@ -1182,6 +1182,11 @@ def profile():
 def home():
     return render_template('home.html')
 
+@app.route('/health')
+def health_check():
+    """Health check endpoint for uptime monitoring (UptimeRobot, etc.)"""
+    return 'OK', 200
+
 @app.route('/producer')
 @login_required
 def producer_dashboard():
