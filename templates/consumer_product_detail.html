@@ -99,33 +99,33 @@
 
             {% if product.screen_inches %}
             <div class="border-l-4 border-indigo-500 pl-4 py-2">
-                <div class="text-sm text-gray-500 uppercase tracking-wide font-semibold">Screen Size</div>
-                <div class="text-2xl font-bold text-gray-900 mt-1">{{ product.screen_inches }}"</div>
-                <div class="text-xs text-gray-400 mt-1">Display Diagonal</div>
+                <div class="text-sm text-gray-500 dark:text-slate-400 uppercase tracking-wide font-semibold">Screen Size</div>
+                <div class="text-2xl font-bold text-gray-900 dark:text-white mt-1">{{ product.screen_inches }}"</div>
+                <div class="text-xs text-gray-400 dark:text-slate-500 mt-1">Display Diagonal</div>
             </div>
             {% endif %}
 
             {% if product.camera_mp %}
             <div class="border-l-4 border-pink-500 pl-4 py-2">
-                <div class="text-sm text-gray-500 uppercase tracking-wide font-semibold">Camera</div>
-                <div class="text-2xl font-bold text-gray-900 mt-1">{{ product.camera_mp }} MP</div>
-                <div class="text-xs text-gray-400 mt-1">Main Camera</div>
+                <div class="text-sm text-gray-500 dark:text-slate-400 uppercase tracking-wide font-semibold">Camera</div>
+                <div class="text-2xl font-bold text-gray-900 dark:text-white mt-1">{{ product.camera_mp }} MP</div>
+                <div class="text-xs text-gray-400 dark:text-slate-500 mt-1">Main Camera</div>
             </div>
             {% endif %}
 
             {% if product.price_usd %}
             <div class="border-l-4 border-red-500 pl-4 py-2">
-                <div class="text-sm text-gray-500 uppercase tracking-wide font-semibold">Price</div>
-                <div class="text-2xl font-bold text-gray-900 mt-1">${{ product.price_usd }}</div>
-                <div class="text-xs text-gray-400 mt-1">USD</div>
+                <div class="text-sm text-gray-500 dark:text-slate-400 uppercase tracking-wide font-semibold">Price</div>
+                <div class="text-2xl font-bold text-gray-900 dark:text-white mt-1">${{ product.price_usd }}</div>
+                <div class="text-xs text-gray-400 dark:text-slate-500 mt-1">USD</div>
             </div>
             {% endif %}
 
             {% if product.weight_g %}
             <div class="border-l-4 border-gray-500 pl-4 py-2">
-                <div class="text-sm text-gray-500 uppercase tracking-wide font-semibold">Weight</div>
-                <div class="text-2xl font-bold text-gray-900 mt-1">{{ product.weight_g }} g</div>
-                <div class="text-xs text-gray-400 mt-1">Device Weight</div>
+                <div class="text-sm text-gray-500 dark:text-slate-400 uppercase tracking-wide font-semibold">Weight</div>
+                <div class="text-2xl font-bold text-gray-900 dark:text-white mt-1">{{ product.weight_g }} g</div>
+                <div class="text-xs text-gray-400 dark:text-slate-500 mt-1">Device Weight</div>
             </div>
             {% endif %}
         </div>
@@ -133,71 +133,71 @@
 
     <!-- Component Details -->
     <div class="glass-panel p-8 mb-6">
-        <h2 class="text-xl font-bold text-gray-900 mb-6 flex items-center">
-            <svg class="w-6 h-6 mr-2 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+        <h2 class="text-xl font-bold text-gray-900 dark:text-white mb-6 flex items-center">
+            <svg class="w-6 h-6 mr-2 text-purple-600 dark:text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
             Component Details (Manufacturer & Model)
         </h2>
         
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
             {% if product.processor_model %}
-            <div class="border-l-4 border-blue-500 pl-4 py-2 bg-blue-50 rounded">
-                <div class="text-sm text-gray-500 uppercase tracking-wide font-semibold">Processor Model</div>
-                <div class="text-lg font-semibold text-gray-900 mt-2">{{ product.processor_model }}</div>
+            <div class="border-l-4 border-blue-500 pl-4 py-2 bg-blue-50 dark:bg-blue-900/30 rounded">
+                <div class="text-sm text-gray-500 dark:text-slate-400 uppercase tracking-wide font-semibold">Processor Model</div>
+                <div class="text-lg font-semibold text-gray-900 dark:text-white mt-2">{{ product.processor_model }}</div>
             </div>
             {% endif %}
 
             {% if product.ram_type %}
-            <div class="border-l-4 border-purple-500 pl-4 py-2 bg-purple-50 rounded">
-                <div class="text-sm text-gray-500 uppercase tracking-wide font-semibold">RAM Type</div>
-                <div class="text-lg font-semibold text-gray-900 mt-2">{{ product.ram_type }}</div>
+            <div class="border-l-4 border-purple-500 pl-4 py-2 bg-purple-50 dark:bg-purple-900/30 rounded">
+                <div class="text-sm text-gray-500 dark:text-slate-400 uppercase tracking-wide font-semibold">RAM Type</div>
+                <div class="text-lg font-semibold text-gray-900 dark:text-white mt-2">{{ product.ram_type }}</div>
             </div>
             {% endif %}
 
             {% if product.storage_type %}
-            <div class="border-l-4 border-green-500 pl-4 py-2 bg-green-50 rounded">
-                <div class="text-sm text-gray-500 uppercase tracking-wide font-semibold">Storage Type</div>
-                <div class="text-lg font-semibold text-gray-900 mt-2">{{ product.storage_type }}</div>
+            <div class="border-l-4 border-green-500 pl-4 py-2 bg-green-50 dark:bg-green-900/30 rounded">
+                <div class="text-sm text-gray-500 dark:text-slate-400 uppercase tracking-wide font-semibold">Storage Type</div>
+                <div class="text-lg font-semibold text-gray-900 dark:text-white mt-2">{{ product.storage_type }}</div>
             </div>
             {% endif %}
 
             {% if product.battery_tech %}
-            <div class="border-l-4 border-yellow-500 pl-4 py-2 bg-yellow-50 rounded">
-                <div class="text-sm text-gray-500 uppercase tracking-wide font-semibold">Battery Technology</div>
-                <div class="text-lg font-semibold text-gray-900 mt-2">{{ product.battery_tech }}</div>
+            <div class="border-l-4 border-yellow-500 pl-4 py-2 bg-yellow-50 dark:bg-yellow-900/30 rounded">
+                <div class="text-sm text-gray-500 dark:text-slate-400 uppercase tracking-wide font-semibold">Battery Technology</div>
+                <div class="text-lg font-semibold text-gray-900 dark:text-white mt-2">{{ product.battery_tech }}</div>
                 {% if product.charging_watt %}
-                <div class="text-xs text-gray-500 mt-1">{{ product.charging_watt }}W Charging</div>
+                <div class="text-xs text-gray-500 dark:text-slate-400 mt-1">{{ product.charging_watt }}W Charging</div>
                 {% endif %}
             </div>
             {% endif %}
 
             {% if product.display_type %}
-            <div class="border-l-4 border-indigo-500 pl-4 py-2 bg-indigo-50 rounded">
-                <div class="text-sm text-gray-500 uppercase tracking-wide font-semibold">Display Type</div>
-                <div class="text-lg font-semibold text-gray-900 mt-2">{{ product.display_type }}</div>
+            <div class="border-l-4 border-indigo-500 pl-4 py-2 bg-indigo-50 dark:bg-indigo-900/30 rounded">
+                <div class="text-sm text-gray-500 dark:text-slate-400 uppercase tracking-wide font-semibold">Display Type</div>
+                <div class="text-lg font-semibold text-gray-900 dark:text-white mt-2">{{ product.display_type }}</div>
                 {% if product.refresh_rate_hz %}
-                <div class="text-xs text-gray-500 mt-1">{{ product.refresh_rate_hz }} Hz</div>
+                <div class="text-xs text-gray-500 dark:text-slate-400 mt-1">{{ product.refresh_rate_hz }} Hz</div>
                 {% endif %}
             </div>
             {% endif %}
 
             {% if product.camera_sensor_main %}
-            <div class="border-l-4 border-pink-500 pl-4 py-2 bg-pink-50 rounded">
-                <div class="text-sm text-gray-500 uppercase tracking-wide font-semibold">Main Camera Sensor</div>
-                <div class="text-lg font-semibold text-gray-900 mt-2">{{ product.camera_sensor_main }}</div>
+            <div class="border-l-4 border-pink-500 pl-4 py-2 bg-pink-50 dark:bg-pink-900/30 rounded">
+                <div class="text-sm text-gray-500 dark:text-slate-400 uppercase tracking-wide font-semibold">Main Camera Sensor</div>
+                <div class="text-lg font-semibold text-gray-900 dark:text-white mt-2">{{ product.camera_sensor_main }}</div>
             </div>
             {% endif %}
 
             {% if product.camera_sensor_ultra %}
-            <div class="border-l-4 border-red-500 pl-4 py-2 bg-red-50 rounded">
-                <div class="text-sm text-gray-500 uppercase tracking-wide font-semibold">Ultra-wide Camera Sensor</div>
-                <div class="text-lg font-semibold text-gray-900 mt-2">{{ product.camera_sensor_ultra }}</div>
+            <div class="border-l-4 border-red-500 pl-4 py-2 bg-red-50 dark:bg-red-900/30 rounded">
+                <div class="text-sm text-gray-500 dark:text-slate-400 uppercase tracking-wide font-semibold">Ultra-wide Camera Sensor</div>
+                <div class="text-lg font-semibold text-gray-900 dark:text-white mt-2">{{ product.camera_sensor_ultra }}</div>
             </div>
             {% endif %}
 
             {% if product.camera_sensor_telephoto %}
-            <div class="border-l-4 border-orange-500 pl-4 py-2 bg-orange-50 rounded">
-                <div class="text-sm text-gray-500 uppercase tracking-wide font-semibold">Telephoto Camera Sensor</div>
-                <div class="text-lg font-semibold text-gray-900 mt-2">{{ product.camera_sensor_telephoto }}</div>
+            <div class="border-l-4 border-orange-500 pl-4 py-2 bg-orange-50 dark:bg-orange-900/30 rounded">
+                <div class="text-sm text-gray-500 dark:text-slate-400 uppercase tracking-wide font-semibold">Telephoto Camera Sensor</div>
+                <div class="text-lg font-semibold text-gray-900 dark:text-white mt-2">{{ product.camera_sensor_telephoto }}</div>
             </div>
             {% endif %}
         </div>
@@ -206,45 +206,45 @@
     <!-- Where to Buy -->
     {% if product.link_amazon or product.link_flipkart or product.link_official or product.link_other %}
     <div class="glass-panel p-6 mb-6">
-        <h2 class="text-xl font-bold text-gray-900 mb-4 flex items-center">
-            <svg class="w-6 h-6 mr-2 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
+        <h2 class="text-xl font-bold text-gray-900 dark:text-white mb-4 flex items-center">
+            <svg class="w-6 h-6 mr-2 text-green-600 dark:text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
             Where to Buy
         </h2>
         
         <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
             {% if product.link_amazon %}
             <a href="{{ product.link_amazon }}" target="_blank" rel="noopener noreferrer"
-               class="flex flex-col items-center p-4 bg-orange-50 hover:bg-orange-100 rounded-lg border border-orange-200 transition group">
+               class="flex flex-col items-center p-4 bg-orange-50 dark:bg-orange-900/30 hover:bg-orange-100 dark:hover:bg-orange-900/50 rounded-lg border border-orange-200 dark:border-orange-800 transition group">
                 <span class="text-3xl mb-2">🛒</span>
-                <span class="font-medium text-orange-700 group-hover:text-orange-900">Amazon</span>
-                <span class="text-xs text-gray-500 mt-1">View Product →</span>
+                <span class="font-medium text-orange-700 dark:text-orange-300 group-hover:text-orange-900 dark:group-hover:text-orange-200">Amazon</span>
+                <span class="text-xs text-gray-500 dark:text-slate-400 mt-1">View Product →</span>
             </a>
             {% endif %}
             
             {% if product.link_flipkart %}
             <a href="{{ product.link_flipkart }}" target="_blank" rel="noopener noreferrer"
-               class="flex flex-col items-center p-4 bg-yellow-50 hover:bg-yellow-100 rounded-lg border border-yellow-200 transition group">
+               class="flex flex-col items-center p-4 bg-yellow-50 dark:bg-yellow-900/30 hover:bg-yellow-100 dark:hover:bg-yellow-900/50 rounded-lg border border-yellow-200 dark:border-yellow-800 transition group">
                 <span class="text-3xl mb-2">🛍️</span>
-                <span class="font-medium text-yellow-700 group-hover:text-yellow-900">Flipkart</span>
-                <span class="text-xs text-gray-500 mt-1">View Product →</span>
+                <span class="font-medium text-yellow-700 dark:text-yellow-300 group-hover:text-yellow-900 dark:group-hover:text-yellow-200">Flipkart</span>
+                <span class="text-xs text-gray-500 dark:text-slate-400 mt-1">View Product →</span>
             </a>
             {% endif %}
             
             {% if product.link_official %}
             <a href="{{ product.link_official }}" target="_blank" rel="noopener noreferrer"
-               class="flex flex-col items-center p-4 bg-blue-50 hover:bg-blue-100 rounded-lg border border-blue-200 transition group">
+               class="flex flex-col items-center p-4 bg-blue-50 dark:bg-blue-900/30 hover:bg-blue-100 dark:hover:bg-blue-900/50 rounded-lg border border-blue-200 dark:border-blue-800 transition group">
                 <span class="text-3xl mb-2">🏢</span>
-                <span class="font-medium text-blue-700 group-hover:text-blue-900">Official Store</span>
-                <span class="text-xs text-gray-500 mt-1">View Product →</span>
+                <span class="font-medium text-blue-700 dark:text-blue-300 group-hover:text-blue-900 dark:group-hover:text-blue-200">Official Store</span>
+                <span class="text-xs text-gray-500 dark:text-slate-400 mt-1">View Product →</span>
             </a>
             {% endif %}
             
             {% if product.link_other %}
             <a href="{{ product.link_other }}" target="_blank" rel="noopener noreferrer"
-               class="flex flex-col items-center p-4 bg-gray-50 hover:bg-gray-100 rounded-lg border border-gray-200 transition group">
+               class="flex flex-col items-center p-4 bg-gray-50 dark:bg-slate-700 hover:bg-gray-100 dark:hover:bg-slate-600 rounded-lg border border-gray-200 dark:border-slate-600 transition group">
                 <span class="text-3xl mb-2">🔗</span>
-                <span class="font-medium text-gray-700 group-hover:text-gray-900">Other</span>
-                <span class="text-xs text-gray-500 mt-1">View Product →</span>
+                <span class="font-medium text-gray-700 dark:text-slate-300 group-hover:text-gray-900 dark:group-hover:text-white">Other</span>
+                <span class="text-xs text-gray-500 dark:text-slate-400 mt-1">View Product →</span>
             </a>
             {% endif %}
         </div>
@@ -253,40 +253,40 @@
 
     <!-- Price Tracking & Alerts -->
     <div class="glass-panel p-6 mb-6">
-        <h2 class="text-xl font-bold text-gray-900 mb-4 flex items-center">
-            <svg class="w-6 h-6 mr-2 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 12l3-3 3 3 4-4M8 21l4-4 4 4M3 4h18M4 4h16v12a1 1 0 01-1 1H5a1 1 0 01-1-1V4z"></path></svg>
+        <h2 class="text-xl font-bold text-gray-900 dark:text-white mb-4 flex items-center">
+            <svg class="w-6 h-6 mr-2 text-purple-600 dark:text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 12l3-3 3 3 4-4M8 21l4-4 4 4M3 4h18M4 4h16v12a1 1 0 01-1 1H5a1 1 0 01-1-1V4z"></path></svg>
             Price Tracking
         </h2>
         
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
             <!-- Price History Chart -->
             <div>
-                <h3 class="font-medium text-gray-700 mb-3">Price History</h3>
-                <div class="bg-gray-50 rounded-lg p-4 h-48 flex items-center justify-center">
+                <h3 class="font-medium text-gray-700 dark:text-slate-300 mb-3">Price History</h3>
+                <div class="bg-gray-50 dark:bg-slate-700 rounded-lg p-4 h-48 flex items-center justify-center">
                     <canvas id="priceChart" class="w-full h-full"></canvas>
                 </div>
             </div>
             
             <!-- Price Alert Form -->
             <div>
-                <h3 class="font-medium text-gray-700 mb-3">🔔 Set Price Alert</h3>
-                <div class="bg-gray-50 rounded-lg p-4">
-                    <p class="text-sm text-gray-600 mb-3">Get notified when the price drops below your target.</p>
+                <h3 class="font-medium text-gray-700 dark:text-slate-300 mb-3">🔔 Set Price Alert</h3>
+                <div class="bg-gray-50 dark:bg-slate-700 rounded-lg p-4">
+                    <p class="text-sm text-gray-600 dark:text-slate-400 mb-3">Get notified when the price drops below your target.</p>
                     
                     <div class="mb-3">
-                        <span class="text-sm text-gray-500">Current Price:</span>
-                        <span class="text-lg font-bold text-gray-900">${{ "%.2f"|format(product.price_usd) }}</span>
+                        <span class="text-sm text-gray-500 dark:text-slate-400">Current Price:</span>
+                        <span class="text-lg font-bold text-gray-900 dark:text-white">${{ "%.2f"|format(product.price_usd) }}</span>
                     </div>
                     
                     {% if current_user.is_authenticated and current_user.role == 'consumer' %}
                     <form action="{{ url_for('set_price_alert', product_id=product.id) }}" method="POST">
                         <div class="flex gap-2">
                             <div class="relative flex-1">
-                                <span class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">$</span>
+                                <span class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 dark:text-slate-400">$</span>
                                 <input type="number" name="target_price" step="0.01" min="1" 
                                        max="{{ product.price_usd - 1 }}"
                                        placeholder="{{ (product.price_usd * 0.9)|int }}"
-                                       class="w-full pl-7 pr-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
+                                       class="w-full pl-7 pr-3 py-2 border border-gray-300 dark:border-slate-600 bg-white dark:bg-slate-800 text-gray-900 dark:text-white rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
                                        required>
                             </div>
                             <button type="submit" class="px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-lg font-medium transition">
@@ -294,12 +294,12 @@
                             </button>
                         </div>
                     </form>
-                    <a href="{{ url_for('my_price_alerts') }}" class="inline-block mt-3 text-sm text-purple-600 hover:text-purple-800">
+                    <a href="{{ url_for('my_price_alerts') }}" class="inline-block mt-3 text-sm text-purple-600 dark:text-purple-400 hover:text-purple-800 dark:hover:text-purple-300">
                         View my alerts →
                     </a>
                     {% else %}
-                    <p class="text-sm text-gray-500">
-                        <a href="{{ url_for('login') }}" class="text-purple-600 hover:underline">Log in</a> as a consumer to set price alerts.
+                    <p class="text-sm text-gray-500 dark:text-slate-400">
+                        <a href="{{ url_for('login') }}" class="text-purple-600 dark:text-purple-400 hover:underline">Log in</a> as a consumer to set price alerts.
                     </p>
                     {% endif %}
                 </div>
@@ -309,15 +309,15 @@
 
     <!-- Blockchain Verification (Consumer View) -->
     {% if product.blockchain_tx %}
-    <div class="glass-panel p-6 mb-6 bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200">
+    <div class="glass-panel p-6 mb-6 bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-900/30 dark:to-emerald-900/30 border border-green-200 dark:border-green-800">
         <div class="flex items-center justify-between">
             <div class="flex items-center">
                 <div class="w-12 h-12 bg-green-500 rounded-full flex items-center justify-center mr-4">
                     <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path></svg>
                 </div>
                 <div>
-                    <h3 class="text-lg font-bold text-green-800">✓ Blockchain Verified Score</h3>
-                    <p class="text-sm text-green-600">This product's credibility score is stored on the {{ product.blockchain_network|capitalize }} blockchain</p>
+                    <h3 class="text-lg font-bold text-green-800 dark:text-green-300">✓ Blockchain Verified Score</h3>
+                    <p class="text-sm text-green-600 dark:text-green-400">This product's credibility score is stored on the {{ product.blockchain_network|capitalize }} blockchain</p>
                 </div>
             </div>
             <button onclick="verifyScore({{ product.id }})" class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 text-sm font-medium">
@@ -331,82 +331,82 @@
     <!-- User Reviews Section -->
     <div class="glass-panel p-8 mb-6">
         <div class="flex items-center justify-between mb-6">
-            <h2 class="text-xl font-bold text-gray-900 flex items-center">
+            <h2 class="text-xl font-bold text-gray-900 dark:text-white flex items-center">
                 <svg class="w-6 h-6 mr-2 text-yellow-500" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path></svg>
                 User Reviews
             </h2>
             {% if product.average_user_rating %}
             <div class="text-right">
-                <div class="text-3xl font-bold text-yellow-600">{{ product.average_user_rating }}/5</div>
-                <div class="text-sm text-gray-500">{{ product.reviews|length }} review{{ 's' if product.reviews|length != 1 else '' }}</div>
+                <div class="text-3xl font-bold text-yellow-600 dark:text-yellow-400">{{ product.average_user_rating }}/5</div>
+                <div class="text-sm text-gray-500 dark:text-slate-400">{{ product.reviews|length }} review{{ 's' if product.reviews|length != 1 else '' }}</div>
             </div>
             {% endif %}
         </div>
 
         <!-- Review Form -->
-        <div class="bg-gray-50 rounded-lg p-6 mb-6">
+        <div class="bg-gray-50 dark:bg-slate-700 rounded-lg p-6 mb-6">
             {% if user_review %}
             <div class="flex items-center justify-between mb-4">
-                <h3 class="font-semibold text-gray-900">Edit Your Review</h3>
-                <span class="text-xs text-gray-500 bg-gray-200 px-2 py-1 rounded">You already reviewed this product</span>
+                <h3 class="font-semibold text-gray-900 dark:text-white">Edit Your Review</h3>
+                <span class="text-xs text-gray-500 dark:text-slate-400 bg-gray-200 dark:bg-slate-600 px-2 py-1 rounded">You already reviewed this product</span>
             </div>
             {% else %}
-            <h3 class="font-semibold text-gray-900 mb-4">Rate this product</h3>
+            <h3 class="font-semibold text-gray-900 dark:text-white mb-4">Rate this product</h3>
             {% endif %}
             
             <form method="POST" action="{{ url_for('submit_review', product_id=product.id) }}">
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                     <!-- Display Rating -->
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">Display Quality</label>
+                        <label class="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-2">Display Quality</label>
                         <div class="star-rating-input flex-row-reverse justify-end items-center space-x-reverse space-x-1">
                             {% for i in range(5, 0, -1) %}
                             <input type="radio" id="display_{{ i }}" name="display_rating" value="{{ i }}" class="hidden star-input" {% if user_review and user_review.display_rating == i %}checked{% endif %} required>
-                            <label for="display_{{ i }}" class="cursor-pointer text-2xl text-gray-300">★</label>
+                            <label for="display_{{ i }}" class="cursor-pointer text-2xl text-gray-300 dark:text-slate-500">★</label>
                             {% endfor %}
                         </div>
                     </div>
 
                     <!-- Performance Rating -->
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">Performance</label>
+                        <label class="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-2">Performance</label>
                         <div class="star-rating-input flex-row-reverse justify-end items-center space-x-reverse space-x-1">
                             {% for i in range(5, 0, -1) %}
                             <input type="radio" id="performance_{{ i }}" name="performance_rating" value="{{ i }}" class="hidden star-input" {% if user_review and user_review.performance_rating == i %}checked{% endif %} required>
-                            <label for="performance_{{ i }}" class="cursor-pointer text-2xl text-gray-300">★</label>
+                            <label for="performance_{{ i }}" class="cursor-pointer text-2xl text-gray-300 dark:text-slate-500">★</label>
                             {% endfor %}
                         </div>
                     </div>
 
                     <!-- Battery Rating -->
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">Battery Life</label>
+                        <label class="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-2">Battery Life</label>
                         <div class="star-rating-input flex-row-reverse justify-end items-center space-x-reverse space-x-1">
                             {% for i in range(5, 0, -1) %}
                             <input type="radio" id="battery_{{ i }}" name="battery_rating" value="{{ i }}" class="hidden star-input" {% if user_review and user_review.battery_rating == i %}checked{% endif %} required>
-                            <label for="battery_{{ i }}" class="cursor-pointer text-2xl text-gray-300">★</label>
+                            <label for="battery_{{ i }}" class="cursor-pointer text-2xl text-gray-300 dark:text-slate-500">★</label>
                             {% endfor %}
                         </div>
                     </div>
 
                     <!-- Camera Rating -->
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">Camera Quality</label>
+                        <label class="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-2">Camera Quality</label>
                         <div class="star-rating-input flex-row-reverse justify-end items-center space-x-reverse space-x-1">
                             {% for i in range(5, 0, -1) %}
                             <input type="radio" id="camera_{{ i }}" name="camera_rating" value="{{ i }}" class="hidden star-input" {% if user_review and user_review.camera_rating == i %}checked{% endif %} required>
-                            <label for="camera_{{ i }}" class="cursor-pointer text-2xl text-gray-300">★</label>
+                            <label for="camera_{{ i }}" class="cursor-pointer text-2xl text-gray-300 dark:text-slate-500">★</label>
                             {% endfor %}
                         </div>
                     </div>
 
                     <!-- Design Rating -->
                     <div class="md:col-span-2">
-                        <label class="block text-sm font-medium text-gray-700 mb-2">Design & Build Quality</label>
+                        <label class="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-2">Design & Build Quality</label>
                         <div class="star-rating-input flex-row-reverse justify-end items-center space-x-reverse space-x-1">
                             {% for i in range(5, 0, -1) %}
                             <input type="radio" id="design_{{ i }}" name="design_rating" value="{{ i }}" class="hidden star-input" {% if user_review and user_review.design_rating == i %}checked{% endif %} required>
-                            <label for="design_{{ i }}" class="cursor-pointer text-2xl text-gray-300">★</label>
+                            <label for="design_{{ i }}" class="cursor-pointer text-2xl text-gray-300 dark:text-slate-500">★</label>
                             {% endfor %}
                         </div>
                     </div>
@@ -414,11 +414,11 @@
 
                 <!-- Text Review (Required for Emotion Detection) -->
                 <div class="mb-4">
-                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                    <label class="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-2">
                         Your Review <span class="text-red-500">*</span>
-                        <span class="text-xs text-gray-500 font-normal">(AI analyzes your text to detect sentiment)</span>
+                        <span class="text-xs text-gray-500 dark:text-slate-400 font-normal">(AI analyzes your text to detect sentiment)</span>
                     </label>
-                    <textarea name="review_text" rows="3" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="Share your experience with this product..." required>{{ user_review.review_text if user_review else '' }}</textarea>
+                    <textarea name="review_text" rows="3" class="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 bg-white dark:bg-slate-800 text-gray-900 dark:text-white rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="Share your experience with this product..." required>{{ user_review.review_text if user_review else '' }}</textarea>
                 </div>
 
                 <button type="submit" class="w-full bg-blue-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-blue-700 transition">
@@ -430,9 +430,9 @@
         <!-- Existing Reviews -->
         {% if reviews %}
         <div class="space-y-4">
-            <h3 class="font-semibold text-gray-900 mb-3">Customer Reviews</h3>
+            <h3 class="font-semibold text-gray-900 dark:text-white mb-3">Customer Reviews</h3>
             {% for review in reviews %}
-            <div class="border border-gray-200 rounded-lg p-4 bg-white {% if review.credibility_flag == 'suspicious' %}border-l-4 border-l-orange-400{% elif review.credibility_flag == 'genuine' and review.credibility_score and review.credibility_score > 0.8 %}border-l-4 border-l-green-400{% endif %} {% if review.user_id == current_user.id %}ring-2 ring-blue-300{% endif %}">
+            <div class="border border-gray-200 dark:border-slate-600 rounded-lg p-4 bg-white dark:bg-slate-800 {% if review.credibility_flag == 'suspicious' %}border-l-4 border-l-orange-400{% elif review.credibility_flag == 'genuine' and review.credibility_score and review.credibility_score > 0.8 %}border-l-4 border-l-green-400{% endif %} {% if review.user_id == current_user.id %}ring-2 ring-blue-300 dark:ring-blue-500{% endif %}">
                 <div class="flex items-start justify-between mb-3">
                     <div>
                         <div class="flex items-center gap-2">
@@ -441,34 +441,34 @@
                                 <div class="w-8 h-8 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-full flex items-center justify-center text-white text-sm font-bold mr-2">
                                     {{ review.user.username[0]|upper if review.user else '?' }}
                                 </div>
-                                <div class="font-semibold text-gray-900">
+                                <div class="font-semibold text-gray-900 dark:text-white">
                                     {{ review.user.username if review.user else 'Unknown User' }}
                                     {% if review.user_id == current_user.id %}
-                                    <span class="text-xs text-blue-600 font-normal">(You)</span>
+                                    <span class="text-xs text-blue-600 dark:text-blue-400 font-normal">(You)</span>
                                     {% endif %}
                                 </div>
                             </div>
                             {% if review.credibility_flag == 'genuine' and review.credibility_score and review.credibility_score > 0.8 %}
-                            <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                            <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-green-100 dark:bg-green-900/40 text-green-800 dark:text-green-300">
                                 <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path></svg>
                                 Verified Sentiment
                             </span>
                             {% elif review.credibility_flag == 'suspicious' %}
-                            <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-orange-100 text-orange-800">
+                            <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-orange-100 dark:bg-orange-900/40 text-orange-800 dark:text-orange-300">
                                 <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"></path></svg>
                                 Sentiment Mismatch
                             </span>
                             {% endif %}
                         </div>
-                        <div class="text-xs text-gray-500 ml-10">
+                        <div class="text-xs text-gray-500 dark:text-slate-400 ml-10">
                             {{ review.timestamp.strftime('%B %d, %Y') }}
                             {% if review.updated_at %}
-                            <span class="text-gray-400">(edited)</span>
+                            <span class="text-gray-400 dark:text-slate-500">(edited)</span>
                             {% endif %}
                         </div>
                     </div>
                     <div class="text-right">
-                        <div class="text-xl font-bold text-yellow-600">{{ review.average_rating }}/5</div>
+                        <div class="text-xl font-bold text-yellow-600 dark:text-yellow-400">{{ review.average_rating }}/5</div>
                         <div class="flex text-yellow-500">
                             {% for i in range(review.average_rating|int) %}★{% endfor %}
                             {% if review.average_rating % 1 >= 0.5 %}½{% endif %}
@@ -478,51 +478,51 @@
 
                 <div class="grid grid-cols-2 md:grid-cols-6 gap-2 text-xs mb-3">
                     <div class="text-center">
-                        <div class="text-gray-600">Display</div>
-                        <div class="font-semibold text-gray-900">{{ review.display_rating }}/5</div>
+                        <div class="text-gray-600 dark:text-slate-400">Display</div>
+                        <div class="font-semibold text-gray-900 dark:text-white">{{ review.display_rating }}/5</div>
                     </div>
                     <div class="text-center">
-                        <div class="text-gray-600">Performance</div>
-                        <div class="font-semibold text-gray-900">{{ review.performance_rating }}/5</div>
+                        <div class="text-gray-600 dark:text-slate-400">Performance</div>
+                        <div class="font-semibold text-gray-900 dark:text-white">{{ review.performance_rating }}/5</div>
                     </div>
                     <div class="text-center">
-                        <div class="text-gray-600">Battery</div>
-                        <div class="font-semibold text-gray-900">{{ review.battery_rating }}/5</div>
+                        <div class="text-gray-600 dark:text-slate-400">Battery</div>
+                        <div class="font-semibold text-gray-900 dark:text-white">{{ review.battery_rating }}/5</div>
                     </div>
                     <div class="text-center">
-                        <div class="text-gray-600">Camera</div>
-                        <div class="font-semibold text-gray-900">{{ review.camera_rating }}/5</div>
+                        <div class="text-gray-600 dark:text-slate-400">Camera</div>
+                        <div class="font-semibold text-gray-900 dark:text-white">{{ review.camera_rating }}/5</div>
                     </div>
                     <div class="text-center">
-                        <div class="text-gray-600">Design</div>
-                        <div class="font-semibold text-gray-900">{{ review.design_rating }}/5</div>
+                        <div class="text-gray-600 dark:text-slate-400">Design</div>
+                        <div class="font-semibold text-gray-900 dark:text-white">{{ review.design_rating }}/5</div>
                     </div>
                     {% if review.emotion_label %}
                     <div class="text-center">
-                        <div class="text-gray-600">Emotion</div>
-                        <div class="font-semibold capitalize {% if review.emotion_label in ['joy'] %}text-green-600{% elif review.emotion_label in ['neutral', 'surprise'] %}text-yellow-600{% else %}text-red-600{% endif %}">
+                        <div class="text-gray-600 dark:text-slate-400">Emotion</div>
+                        <div class="font-semibold capitalize {% if review.emotion_label in ['joy'] %}text-green-600 dark:text-green-400{% elif review.emotion_label in ['neutral', 'surprise'] %}text-yellow-600 dark:text-yellow-400{% else %}text-red-600 dark:text-red-400{% endif %}">
                             {{ review.emotion_label }}
                             {% if review.emotion_confidence %}
-                            <span class="text-gray-400 text-[10px]">({{ (review.emotion_confidence * 100)|int }}%)</span>
+                            <span class="text-gray-400 dark:text-slate-500 text-[10px]">({{ (review.emotion_confidence * 100)|int }}%)</span>
                             {% endif %}
                         </div>
                     </div>
                     {% elif review.user_emotion %}
                     <div class="text-center">
-                        <div class="text-gray-600">Emotion</div>
-                        <div class="font-semibold {% if review.user_emotion >= 4 %}text-green-600{% elif review.user_emotion >= 3 %}text-yellow-600{% else %}text-red-600{% endif %}">{{ review.user_emotion }}/5</div>
+                        <div class="text-gray-600 dark:text-slate-400">Emotion</div>
+                        <div class="font-semibold {% if review.user_emotion >= 4 %}text-green-600 dark:text-green-400{% elif review.user_emotion >= 3 %}text-yellow-600 dark:text-yellow-400{% else %}text-red-600 dark:text-red-400{% endif %}">{{ review.user_emotion }}/5</div>
                     </div>
                     {% endif %}
                 </div>
 
                 {% if review.review_text %}
-                <p class="text-gray-700 text-sm italic">"{{ review.review_text }}"</p>
+                <p class="text-gray-700 dark:text-slate-300 text-sm italic">"{{ review.review_text }}"</p>
                 {% endif %}
             </div>
             {% endfor %}
         </div>
         {% else %}
-        <div class="text-center text-gray-500 py-8">
+        <div class="text-center text-gray-500 dark:text-slate-400 py-8">
             <p>No reviews yet. Be the first to review this product!</p>
         </div>
         {% endif %}
@@ -530,22 +530,22 @@
 
     <!-- Product Information -->
     <div class="glass-panel p-8 mb-6">
-        <h2 class="text-xl font-bold text-gray-900 mb-6 flex items-center">
-            <svg class="w-6 h-6 mr-2 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+        <h2 class="text-xl font-bold text-gray-900 dark:text-white mb-6 flex items-center">
+            <svg class="w-6 h-6 mr-2 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
             Product Information
         </h2>
         
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
             {% if product.batch_number %}
-            <div class="flex justify-between py-2 border-b border-gray-200">
-                <span class="text-gray-600">Batch Number:</span>
-                <span class="font-medium text-gray-900">{{ product.batch_number }}</span>
+            <div class="flex justify-between py-2 border-b border-gray-200 dark:border-slate-700">
+                <span class="text-gray-600 dark:text-slate-400">Batch Number:</span>
+                <span class="font-medium text-gray-900 dark:text-white">{{ product.batch_number }}</span>
             </div>
             {% endif %}
             
-            <div class="flex justify-between py-2 border-b border-gray-200">
-                <span class="text-gray-600">Product ID:</span>
-                <span class="font-medium text-gray-900">#{{ product.id }}</span>
+            <div class="flex justify-between py-2 border-b border-gray-200 dark:border-slate-700">
+                <span class="text-gray-600 dark:text-slate-400">Product ID:</span>
+                <span class="font-medium text-gray-900 dark:text-white">#{{ product.id }}</span>
             </div>
         </div>
     </div>
@@ -553,9 +553,9 @@
     <!-- QR Code -->
     {% if product.qr_code_path %}
     <div class="glass-panel p-8 text-center">
-        <h2 class="text-xl font-bold text-gray-900 mb-4">Product QR Code</h2>
-        <p class="text-sm text-gray-500 mb-6">Scan this code to quickly access product details</p>
-        <div class="inline-block bg-white p-4 rounded-lg shadow-md">
+        <h2 class="text-xl font-bold text-gray-900 dark:text-white mb-4">Product QR Code</h2>
+        <p class="text-sm text-gray-500 dark:text-slate-400 mb-6">Scan this code to quickly access product details</p>
+        <div class="inline-block bg-white dark:bg-slate-700 p-4 rounded-lg shadow-md">
             <img src="/{{ product.qr_code_path }}" alt="QR Code" class="w-48 h-48 mx-auto">
         </div>
     </div>
